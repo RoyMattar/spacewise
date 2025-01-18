@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - SpaceWise</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto flex items-center justify-between py-4 px-6">
+      <div class="flex items-center space-x-2">
+        <a href="index.html" class="text-3xl font-bold">𐌂</a> <!-- Clickable Logo -->
+        <span class="text-xl font-semibold">SpaceWise</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto py-10 px-6">
+    <div class="max-w-sm mx-auto bg-white p-8 shadow-md rounded-lg">
+      <h2 class="text-2xl font-semibold text-center mb-4">Admin Login</h2>
+      <form id="admin-login-form" action="admin.html" method="get">
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-medium text-gray-600">Username</label>
+          <input type="text" id="username" name="username" class="w-full p-2 mt-2 border border-gray-300 rounded" required>
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
+          <input type="password" id="password" name="password" class="w-full p-2 mt-2 border border-gray-300 rounded" required>
+        </div>
+        <button type="submit" id="login-btn" class="w-full py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+          Login
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Handle form submission to ensure both fields are filled
+    document.getElementById('admin-login-form').addEventListener('submit', function (e) {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        e.preventDefault();
+        alert('Please enter both username and password.');
+      }
+    });
+  </script>
+</body>
+</html>
