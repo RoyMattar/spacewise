@@ -177,7 +177,8 @@ The following npm scripts are available for database management and starting the
 ### Branching and Commit Rules
 - Create feature-specific branches for development.
 - Submit pull requests for review before merging.
-- Include clear commit messages for traceability.
+- Include clear commit messages for traceability (titles and descriptions).
+- Include tags in the commit titles for clarity - [INFRA], [SERVER] or [CLIENT].
 
 ### Code Style
 - Follow **JavaScript Standard Style**.
