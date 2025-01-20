@@ -1,0 +1,36 @@
+{
+    "name": "spacewise",
+    "version": "1.0.0",
+    "description": "Web application for reserving seats in libraries and co-working spaces",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build-db": "sqlite3 database.db < db_schema.sql # build a new database from the sql file",
+      "init-dummy-data": "sqlite3 database.db < db_dummy_data.sql # insert dummy data into the database",
+      "clean-db": "rm database.db # remove the old database",
+      "rebuild-db": "npm run clean-db && npm run build-db # rebuild the database without dummy data",
+      "rebuild-db-dummy": "npm run clean-db && npm run build-db && npm run init-dummy-data # rebuild the database with dummy data",
+      "clean-db-win": "del database.db # remove the old database (windows)",
+      "rebuild-db-win": "npm run clean-db-win && npm run build-db # rebuild the database without dummy data",
+      "rebuild-db-dummy-win": "npm run clean-db-win && npm run build-db && npm run init-dummy-data # rebuild the database with dummy data",
+      "start": "node index.js"
+    },
+    "author": "SpaceWise Team",
+    "license": "ISC",
+    "dependencies": {
+      "node": "^18.20.4",
+      "express": "^4.19.2",
+      "express-session": "^1.17.1",
+      "ejs": "^3.1.8",
+      "sqlite3": "^5.1.2",
+      "tailwindcss": "^2.2.19",
+      "body-parser": "^1.19.0",
+      "dotenv": "^10.0.0",
+      "bcrypt": "^5.0.1"
+    },
+    "engines": {
+      "npm": ">=8.0.0",
+      "node": ">=16.0.0"
+    }
+}
+  
