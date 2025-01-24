@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - SpaceWise</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <%- include('header') %>
+
+  <!-- Main Content -->
+  <main class="container mx-auto py-10 px-6">
+    <h2 class="text-2xl font-semibold mb-6">My Reservations</h2>
+    
+    <!-- Active Reservations -->
+    <section class="mb-10">
+      <h3 class="text-lg font-semibold mb-4">Active Reservations</h3>
+      <ul class="space-y-4">
+        <% activeReservations.forEach(reservation => { %>
+          <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
+            <div>
+              <p class="font-semibold"><%= reservation.room %> | Seat <%= reservation.seat %></p>
+              <p class="text-gray-600 text-sm">
+                Date: <%= reservation.date %> | Time: <%= reservation.startTime %> - <%= reservation.endTime %>
+              </p>
+            </div>
+            <div class="flex space-x-2">
+              <button class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
+                Confirm
+              </button>
+              <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+                Cancel
+              </button>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+
+    <!-- Past Reservations -->
+    <section>
+      <h3 class="text-lg font-semibold mb-4">Past Reservations</h3>
+      <ul class="space-y-4">
+        <% pastReservations.forEach(reservation => { %>
+          <li class="bg-gray-200 shadow-md rounded-lg p-4">
+            <p class="font-semibold"><%= reservation.room %> | Seat <%= reservation.seat %></p>
+            <p class="text-gray-600 text-sm">
+              Date: <%= reservation.date %> | Time: <%= reservation.startTime %> - <%= reservation.endTime %>
+            </p>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <%- include('footer') %>
+</body>
+</html>

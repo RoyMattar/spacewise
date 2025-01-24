@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - SpaceWise</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <%- include('header') %>
+
+<main class="container mx-auto py-10 px-6">
+  <h2 class="text-2xl font-semibold mb-6">Manage Spaces</h2>
+  <div class="bg-white p-6 shadow-md rounded-lg">
+    <h3 class="text-xl font-semibold mb-4">Spaces List</h3>
+    <ul class="divide-y divide-gray-200">
+      <!-- Example Space Item -->
+      <li class="py-4 flex justify-between items-center">
+        <div>
+          <p class="text-lg font-medium font-bold">St. Regis</p>
+          <p class="text-sm font-medium text-gray-800">Room 101</p>
+          <p class="text-sm text-gray-600">Capacity: 30</p>
+        </div>
+        <div class="flex space-x-4">
+          <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-800">
+            Edit
+          </button>
+          <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+            Delete
+          </button>
+        </div>
+      </li>
+      <li class="py-4 flex justify-between items-center">
+        <div>
+          <p class="text-lg font-medium font-bold">Hyatt Lodge Oakbrook</p>
+          <p class="text-sm font-medium text-gray-800">Room 102</p>
+          <p class="text-sm text-gray-600">Capacity: 50</p>
+        </div>
+        <div class="flex space-x-4">
+          <button class="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-800">
+            Edit
+          </button>
+          <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+            Delete
+          </button>
+        </div>
+      </li>
+    </ul>
+    <hr class="my-6">
+    <h3 class="text-xl font-semibold mb-4">Add New Space</h3>
+    <form>
+      <div class="mb-4">
+        <label for="spaceLocation" class="block text-sm font-medium text-gray-700">Space Location</label>
+        <input type="text" id="spaceLocation" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>  
+      <div class="mb-4">
+        <label for="spaceName" class="block text-sm font-medium text-gray-700">Space Name</label>
+        <input type="text" id="spaceName" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>
+      <div class="mb-4">
+        <label for="capacity" class="block text-sm font-medium text-gray-700">Capacity</label>
+        <input type="number" id="capacity" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>
+      <button type="submit" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+        Add Space
+      </button>
+    </form>
+  </div>
+</main>
+
+    <%- include('footer') %>
+</body>
+</html>
