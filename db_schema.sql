@@ -47,7 +47,7 @@ END;
 CREATE TABLE spaces (
     space_id INTEGER PRIMARY KEY AUTOINCREMENT,
     institution_id INTEGER NOT NULL, -- Foreign key linking to institutions.institution_id
-    name TEXT NOT NULL,
+    space_name TEXT NOT NULL,
     layout_image TEXT, -- URL or path to the uploaded layout image
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE CASCADE
@@ -60,7 +60,7 @@ CREATE TABLE seats (
     seat_name TEXT NOT NULL, -- e.g., 'A1', 'B1'
     type TEXT, -- e.g., 'Chair', 'Table'
     facilities TEXT, -- JSON string to store facilities, e.g., '{"Outlet": true, "Lamp": false}'
-    status TEXT NOT NULL CHECK(status IN ('Available', 'Reserved', 'Unavailable')), -- Current seat status
+    status TEXT NOT NULL CHECK(status IN ('available', 'reserved', 'unavailable')), -- Current seat status
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE,
     UNIQUE (space_id, seat_name) -- Ensure seat_name is unique within a space
