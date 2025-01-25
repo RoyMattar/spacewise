@@ -8,7 +8,7 @@ CREATE TABLE users (
     username TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL CHECK(role IN ('admin', 'student')), -- Role determines subclass
-    institution_id INTEGER DEFAULT NULL, -- Only for admins
+    institution_id INTEGER UNIQUE DEFAULT NULL, -- Only for admins, 1-to-1 with institution
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE SET NULL
 );
@@ -19,7 +19,7 @@ CREATE TABLE institutions (
     bio TEXT,
     address TEXT,
     opening_hours TEXT,
-    admin_id INTEGER NOT NULL, -- Foreign key linking to users.user_id
+    admin_id INTEGER UNIQUE NOT NULL, -- Foreign key linking to users.user_id, 1-to-1 with admin
     FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -40,7 +40,8 @@ CREATE TABLE seats (
     facilities TEXT, -- JSON string to store facilities, e.g., '{"Outlet": true, "Lamp": false}'
     status TEXT NOT NULL CHECK(status IN ('Available', 'Reserved', 'Unavailable')), -- Current seat status
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE
+    FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE,
+    UNIQUE (space_id, seat_name) -- Ensure seat_name is unique within a space
 );
 
 CREATE TABLE reservations (
