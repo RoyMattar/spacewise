@@ -15,7 +15,7 @@ CREATE TABLE users (
 );
 
 -- Enforce: Only admins can be assigned an institution_id
-CREATE TRIGGER enforce_admin_update
+CREATE TRIGGER enforce_institution_in_admin_update
 BEFORE UPDATE OF institution_id ON users
 FOR EACH ROW
 WHEN (SELECT role FROM users WHERE user_id = NEW.user_id) != 'admin'
@@ -34,9 +34,16 @@ CREATE TABLE institutions (
     FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Enforce: Instituions can refer only to admins
-CREATE TRIGGER enforce_admin_id
-BEFORE INSERT OR UPDATE ON institutions
+-- Enforce: Institutions can refer only to admins
+CREATE TRIGGER enforce_admin_in_institution_insert
+BEFORE INSERT ON institutions
+FOR EACH ROW
+WHEN (SELECT role FROM users WHERE user_id = NEW.admin_id) != 'admin'
+BEGIN
+    SELECT RAISE(ABORT, 'admin_id must belong to a user with role=admin');
+END;
+CREATE TRIGGER enforce_admin_in_institution_update
+BEFORE UPDATE ON institutions
 FOR EACH ROW
 WHEN (SELECT role FROM users WHERE user_id = NEW.admin_id) != 'admin'
 BEGIN
@@ -76,7 +83,7 @@ CREATE TABLE reservations (
     status TEXT NOT NULL CHECK(status IN ('active', 'expired', 'cancelled')), -- Reservation status
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE CASCADE,
+    FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE CASCADE
 );
 
 
