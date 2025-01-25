@@ -1,7 +1,7 @@
 BEGIN TRANSACTION;
 
 -- Insert dummy users
-INSERT INTO users (username, password_hash, role, institution_id) VALUES
+INSERT INTO users (username, password_hash, role) VALUES
 ('admin1', 'hashed_password1', 'admin'),
 ('student1', 'hashed_password2', 'student'),
 ('student2', 'hashed_password3', 'student'),
