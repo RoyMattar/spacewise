@@ -29,9 +29,9 @@ INSERT INTO seats (space_id, seat_name, type, facilities, status) VALUES
 (1, 'C1', 'Couch', '{"outlets": false, "lamp": false}', 'unavailable');
 
 -- Insert dummy reservations
-INSERT INTO reservations (space_id, seat_id, user_id, start_time, end_time, status) VALUES
-(1, 1, 2, '2024-12-01 10:00:00', '2024-12-01 12:00:00', 'active'),
-(1, 2, 3, '2024-12-01 13:00:00', '2024-12-01 14:00:00', 'cancelled'),
-(3, 4, 2, '2024-12-02 15:00:00', '2024-12-02 17:00:00', 'expired');
+INSERT INTO reservations (seat_id, user_id, start_time, end_time, status) VALUES
+(1, 2, '2024-12-01 10:00:00', '2024-12-01 12:00:00', 'active'),
+(2, 3, '2024-12-01 13:00:00', '2024-12-01 14:00:00', 'cancelled'),
+(4, 2, '2024-12-02 15:00:00', '2024-12-02 17:00:00', 'expired');
 
 COMMIT;

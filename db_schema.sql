@@ -71,14 +71,12 @@ CREATE TABLE reservations (
     reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL, -- Foreign key linking to users.user_id
     seat_id INTEGER NOT NULL, -- Foreign key linking to seats.seat_id
-    space_id INTEGER NOT NULL, -- Foreign key linking to spaces.space_id
     start_time TIMESTAMP NOT NULL, -- Reservation start time
     end_time TIMESTAMP NOT NULL,   -- Reservation end time
     status TEXT NOT NULL CHECK(status IN ('active', 'expired', 'cancelled')), -- Reservation status
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE CASCADE,
-    FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE
 );
 
 
