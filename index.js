@@ -50,13 +50,13 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth');
 app.use('/', authRoutes);
 
-// Route for admin home page
-const adminRoutes = require('./routes/admin');
-app.use('/admin', adminRoutes);
+// Institution routes
+const institutionRoutes = require('./routes/institutions');
+app.use('/institutions', institutionRoutes);
 
-// Route for student home page
-const studentRoutes = require('./routes/student');
-app.use('/student', studentRoutes);
+// Reservations routes
+const reservationRoutes = require('./routes/reservations');
+app.use('/reservations', reservationRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

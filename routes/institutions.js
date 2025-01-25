@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const ensureAdmin = require('../middleware/ensure_admin');
 
-// Implement routes here
+
 // ------ Institutions Routes ------
+
 //Route to create a new institution
-router.post('/institutions/register', ensureAdmin, function (req, res, next) {
+router.post('/register', ensureAdmin, function (req, res, next) {
     const { institution_name, bio, address, opening_hours, admin_id } = req.body;
     global.db.run(
         'INSERT INTO institutions (name, bio, address, opening_hours) VALUES (?, ?, ?, ?)',
@@ -27,7 +28,7 @@ router.post('/institutions/register', ensureAdmin, function (req, res, next) {
 
 
 //Route to retrieve all spaces for a specific institution
-router.get('/institutions', function (req, res, next) {
+router.get('', function (req, res, next) {
   global.db.all(
       'SELECT institution_id, name, bio, address, opening_hours FROM institutions',
       [],
@@ -40,7 +41,7 @@ router.get('/institutions', function (req, res, next) {
 
 
 //Route to retrieve details of a specific institution
-router.get('/institutions/:id', function (req, res, next) {
+router.get('/:id', function (req, res, next) {
     const institutionId = req.params.id;
     global.db.get(
         `SELECT i.institution_id, i.name, i.bio, i.address, i.opening_hours, u.username AS admin_username
@@ -59,7 +60,7 @@ router.get('/institutions/:id', function (req, res, next) {
 
 
 //Route to update an institution's details
-router.patch('/institutions/:id', ensureAdmin, function (req, res, next) {
+router.patch('/:id', ensureAdmin, function (req, res, next) {
     const { bio, address, opening_hours } = req.body;
     const institutionId = req.params.id;
     global.db.run(
@@ -74,7 +75,7 @@ router.patch('/institutions/:id', ensureAdmin, function (req, res, next) {
 
 
 //Route to delete an institution
-router.delete('/institutions/:id', ensureAdmin, function (req, res, next) {
+router.delete('/:id', ensureAdmin, function (req, res, next) {
     const institutionId = req.params.id;
     global.db.run(
         'DELETE FROM institutions WHERE institution_id = ?',
@@ -88,8 +89,9 @@ router.delete('/institutions/:id', ensureAdmin, function (req, res, next) {
 
 
 // ------ Space Management Routes ------
+
 //Route to create a space for a specific institution
-router.post('/institutions/:id/spaces', ensureAdmin, function (req, res, next) {
+router.post('/:id/spaces', ensureAdmin, function (req, res, next) {
     const { name, layoutImage } = req.body;
     const institutionId = req.params.id;
     global.db.run(
@@ -104,7 +106,7 @@ router.post('/institutions/:id/spaces', ensureAdmin, function (req, res, next) {
 
 
 // Route to retrieve all spaces for a specific institution
-router.get('/institutions/:id/spaces', function (req, res, next) {
+router.get('/:id/spaces', function (req, res, next) {
     const institutionId = req.params.id;
     global.db.all('SELECT space_id, name, layout FROM spaces WHERE institution_id = ?', [institutionId], function (err, rows) {
         if (err) return next(err);
@@ -113,7 +115,7 @@ router.get('/institutions/:id/spaces', function (req, res, next) {
 });
 
 // Route to retrieve all spaces for a specific institution
-router.get('/institutions/:id/spaces/:spaceId', function (req, res, next) {
+router.get('/:id/spaces/:spaceId', function (req, res, next) {
     const institutionId = req.params.id;
     global.db.all('SELECT space_id, name, layout FROM spaces WHERE institution_id = ? AND space_id = ?;', [institutionId, spaceId], function (err, rows) {
         if (err) return next(err);
@@ -123,7 +125,7 @@ router.get('/institutions/:id/spaces/:spaceId', function (req, res, next) {
 
 
 //Route to update details of a specific space
-router.patch('/institutions/:id/spaces/:spaceId', ensureAdmin, function (req, res, next) {
+router.patch('/:id/spaces/:spaceId', ensureAdmin, function (req, res, next) {
     const { name, layoutImage } = req.body;
     const { id: institutionId, spaceId } = req.params;
     global.db.run(
@@ -137,7 +139,7 @@ router.patch('/institutions/:id/spaces/:spaceId', ensureAdmin, function (req, re
 });
 
 //Route to delete a space
-router.delete('/institutions/:id/spaces/:spaceId', ensureAdmin, function (req, res, next) {
+router.delete('/:id/spaces/:spaceId', ensureAdmin, function (req, res, next) {
     const { id: institutionId, spaceId } = req.params;
     global.db.run(
         'DELETE FROM spaces WHERE institution_id = ? AND space_id = ?',
@@ -145,63 +147,6 @@ router.delete('/institutions/:id/spaces/:spaceId', ensureAdmin, function (req, r
         function (err) {
             if (err) return next(err);
             res.json({ message: 'Space deleted successfully.' });
-        }
-    );
-});
-
-// ------ Reservation Management Routes ------
-//Route to create a reservation for a seat
-router.post('/reservations', function (req, res, next) {
-    const { seat_id, user_id, start_time, end_time } = req.body;
-    global.db.run(
-        'INSERT INTO reservations (seat_id, user_id, start_time, end_time, status) VALUES (?, ?, ?, ?, ?)',
-        [seat_id, user_id, start_time, end_time, 'Active'],
-        function (err) {
-            if (err) return next(err);
-            res.json({ reservation_id: this.lastID, message: 'Reservation created successfully.' });
-        }
-    );
-});
-
-//Route to retrieve all reservations for a specific user
-router.get('/reservations/:user_id', function (req, res, next) {
-    const { user_id } = req.params;
-    global.db.all(
-        `SELECT r.reservation_id, r.seat_id, s.name AS seat_name, r.start_time, r.end_time, r.status 
-         FROM reservations r 
-         JOIN seats s ON r.seat_id = s.seat_id 
-         WHERE r.user_id = ?`,
-        [user_id],
-        function (err, rows) {
-            if (err) return next(err);
-            res.json(rows);
-        }
-    );
-});
-
-//Route to update a reservation
-router.patch('/reservations/:id', function (req, res, next) {
-    const { start_time, end_time, status } = req.body;
-    const { id } = req.params;
-    global.db.run(
-        'UPDATE reservations SET start_time = COALESCE(?, start_time), end_time = COALESCE(?, end_time), status = COALESCE(?, status) WHERE reservation_id = ?',
-        [start_time, end_time, status, id],
-        function (err) {
-            if (err) return next(err);
-            res.json({ message: 'Reservation updated successfully.' });
-        }
-    );
-});
-
-//Route to cancel a reservation
-router.delete('/reservations/:id', function (req, res, next) {
-    const { id } = req.params;
-    global.db.run(
-        'UPDATE reservations SET status = "Cancelled" WHERE reservation_id = ?',
-        [id],
-        function (err) {
-            if (err) return next(err);
-            res.json({ message: 'Reservation canceled successfully.' });
         }
     );
 });
