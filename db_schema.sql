@@ -3,6 +3,7 @@ PRAGMA foreign_keys=ON;
 
 BEGIN TRANSACTION;
 
+
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
@@ -12,6 +13,16 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE SET NULL
 );
+
+-- Enforce: Only admins can be assigned an institution_id
+CREATE TRIGGER enforce_admin_update
+BEFORE UPDATE OF institution_id ON users
+FOR EACH ROW
+WHEN (SELECT role FROM users WHERE user_id = NEW.user_id) != 'admin'
+BEGIN
+    SELECT RAISE(ABORT, 'Only admin users can be assigned an institution_id');
+END;
+
 
 CREATE TABLE institutions (
     institution_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,6 +34,16 @@ CREATE TABLE institutions (
     FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+-- Enforce: Instituions can refer only to admins
+CREATE TRIGGER enforce_admin_id
+BEFORE INSERT OR UPDATE ON institutions
+FOR EACH ROW
+WHEN (SELECT role FROM users WHERE user_id = NEW.admin_id) != 'admin'
+BEGIN
+    SELECT RAISE(ABORT, 'admin_id must belong to a user with role=admin');
+END;
+
+
 CREATE TABLE spaces (
     space_id INTEGER PRIMARY KEY AUTOINCREMENT,
     institution_id INTEGER NOT NULL, -- Foreign key linking to institutions.institution_id
@@ -31,6 +52,7 @@ CREATE TABLE spaces (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE seats (
     seat_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,6 +65,7 @@ CREATE TABLE seats (
     FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE,
     UNIQUE (space_id, seat_name) -- Ensure seat_name is unique within a space
 );
+
 
 CREATE TABLE reservations (
     reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,5 +80,6 @@ CREATE TABLE reservations (
     FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE CASCADE,
     FOREIGN KEY (space_id) REFERENCES spaces(space_id) ON DELETE CASCADE
 );
+
 
 COMMIT;
