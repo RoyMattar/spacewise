@@ -36,14 +36,16 @@ router.post('/register', function (req, res, next) {
 
 //Route to retrieve details of all institutions
 router.get('', function (req, res, next) {
-  global.db.all(
-      'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
-      [],
-      function (err, rows) {
-          if (err) return next(err);
-          res.json(rows);
-      }
-  );
+    global.db.all(
+        'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
+        [],
+        function (err, rows) {
+            if (err) return next(err);
+            res.json(rows);
+        }
+    );
+
+    res.render('institutionSelection');
 });
 
 
@@ -60,6 +62,10 @@ router.get('/:id', function (req, res, next) {
             res.json(row);
         }
     );
+
+    if (req.session.isAdmin) {
+        res.render('institutionManagement');
+    }
 });
 
 
@@ -116,6 +122,12 @@ router.get('/:id/spaces', function (req, res, next) {
         if (err) return next(err);
         res.json(rows);
     });
+
+    if (req.session.isAdmin) {
+        res.render('spaceManagement');
+    } else {
+        res.render('spaceSelection');
+    }
 });
 
 // Route to retrieve a specific space for a specific institution
@@ -153,6 +165,15 @@ router.delete('/:id/spaces/:spaceId', function (req, res, next) {
             res.json({ message: 'Space deleted successfully.' });
         }
     );
+});
+
+// Route to get all seats within a space
+router.get('/:id/spaces/:spaceId/seats', function (req, res, next) {
+    if (req.session.isAdmin) {
+        res.render('seatManagement');
+    } else {
+        res.render('seatSelection');
+    }
 });
 
 module.exports = router;

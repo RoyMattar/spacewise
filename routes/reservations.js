@@ -3,6 +3,16 @@ const router = express.Router();
 const ensureAdmin = require('../middleware/ensure_admin');
 
 // ------ Reservation Management Routes ------
+
+// Route to get all reservations
+router.get('/', function (req, res, next) {
+    if (req.session.isAdmin) {
+        res.render('reservationManagement');
+    } else {
+        res.render('reservationSelection');
+    }
+});
+
 //Route to create a reservation for a seat
 router.post('/', function (req, res, next) {
     const { seat_id, user_id, start_time, end_time } = req.body;

@@ -43,7 +43,7 @@ global.db = new sqlite3.Database('./database.db', function(err){
 
 // Main home page accessible to everyone
 app.get('/', (req, res) => {
-    res.render('home'); // Render the main home page
+    res.render('welcome'); // Render the welcome page
 });
 
 // Routes for login and registration
