@@ -83,7 +83,7 @@ SELECT * FROM seats;
 UPDATE seats
 SET type = 'Table',
     facilities = '["Outlet"]',
-    status = 'Unavailable'
+    status = 'unavailable'
 WHERE space_id = 1 AND seat_id = 2;
 
 -- Remove a specific seat
