@@ -4,7 +4,6 @@ const ensureAdmin = require('../middleware/ensure_admin');
 
 
 // ------ Institutions Routes ------
-//** ROUTE NEEDS FIXING**
 // Route to create a new institution
 router.post('/register', function (req, res, next) {
     const { institution_name, bio, address, opening_hours, admin_id } = req.body;
@@ -35,7 +34,7 @@ router.post('/register', function (req, res, next) {
     );
 });
 
-//Route to retrieve all spaces for a specific institution
+//Route to retrieve details of all institutions
 router.get('', function (req, res, next) {
   global.db.all(
       'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
