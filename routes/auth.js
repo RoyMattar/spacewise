@@ -49,6 +49,9 @@ router.post('/login', async (req, res) => {
                     role: user.role
                 };
 
+                // Set success message in session
+                req.session.successMessage = 'Login successful! Welcome back.';
+
                 return res.json({ success: true, redirect: '/home' });
             }
         );
@@ -104,6 +107,9 @@ router.post('/register', async (req, res) => {
                         return res.status(500).json({ error: 'Failed to register user' });
                     }
 
+                    // Set success message in session
+                    req.session.successMessage = 'Registration successful! You can now log in.';
+
                     return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
                 }
             );
@@ -120,10 +126,14 @@ router.post('/register', async (req, res) => {
  * Outputs: Renders the home views
  */
 router.get('/home', (req, res) => {
+    const successMessage = req.session.successMessage;
+    req.session.successMessage = null; // Clear message after displaying
+
+    // Render the relevant home page with a login success message if exists
     if (req.session.user.role === 'admin') {
-        res.render('adminHome');
+        res.render('adminHome', { successMessage });
     } else {
-        res.render('studentHome');
+        res.render('studentHome', { successMessage });
     }
 });
 

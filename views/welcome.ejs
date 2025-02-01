@@ -14,24 +14,40 @@
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center">
 
-    <!-- Main Content -->
-    <main class="bg-white p-6 shadow-md rounded-lg text-center max-w-lg w-full">
-      <h1 class="text-4xl font-extrabold mb-4 text-gray-800">Welcome to SpaceWise</h1>
-      <h2 class="text-2xl font-bold mb-6 text-gray-600">Smart Seats, Seamless Spaces.</h2>
+  <!-- Pop-up notification for registration success message -->
+  <% if (successMessage) { %>
+    <div id="popup-message" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 ease-in-out">
+        <%= successMessage %>
+    </div>
+    <script>
+        window.onload = function () {
+            const popup = document.getElementById('popup-message');
+            if (popup) {
+                popup.classList.remove('opacity-0'); // Show the popup
+                setTimeout(() => { popup.classList.add('opacity-0'); }, 3000); // Auto-hide after 3s
+                popup.addEventListener('click', () => popup.classList.add('opacity-0')); // Hide on click
+            }
+        };
+    </script>
+  <% } %>
 
-      <!-- Navigation -->
-      <div class="flex flex-col space-y-4">
-        <a href="/login">
-          <button class="px-4 py-2 text-lg text-white bg-purple-600 rounded-md w-full hover:bg-purple-800">
-            Login
-          </button>
-        </a>
-        <a href="/register">
-          <button class="px-4 py-2 text-lg text-white bg-black rounded-md w-full hover:bg-gray-800">
-            Register
-          </button>
-        </a>
-      </div>
+  <!-- Main Content -->
+  <main class="bg-white p-6 shadow-md rounded-lg text-center max-w-lg w-full">
+    <h1 class="text-4xl font-extrabold mb-4 text-gray-800">Welcome to SpaceWise</h1>
+    <h2 class="text-2xl font-bold mb-6 text-gray-600">Smart Seats, Seamless Spaces.</h2>
+
+    <!-- Navigation -->
+    <div class="flex flex-col space-y-4">
+      <a href="/login">
+        <button class="px-4 py-2 text-lg text-white bg-purple-600 rounded-md w-full hover:bg-purple-800">
+          Login
+        </button>
+      </a>
+      <a href="/register">
+        <button class="px-4 py-2 text-lg text-white bg-black rounded-md w-full hover:bg-gray-800">
+          Register
+        </button>
+      </a>
     </div>
   </main>
 

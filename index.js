@@ -46,7 +46,9 @@ global.db = new sqlite3.Database('./database.db', function(err){
 
 // Main home page accessible to everyone
 app.get('/', (req, res) => {
-    res.render('welcome'); // Render the welcome page
+    const successMessage = req.session.successMessage;
+    req.session.successMessage = null; // Clear message after displaying
+    res.render('welcome', { successMessage }); // Render the welcome page with a registration success message if exists
 });
 
 // Routes for login and registration

@@ -93,7 +93,7 @@
         const result = await response.json();
 
         if (response.ok) {
-          window.location.href = '/'; // Redirect on successful registration
+          window.location.href = result.redirect; // Redirect on successful registration
         } else {
           errorMessage.textContent = result.error || 'Registration failed.';
           errorMessage.classList.remove('hidden');
