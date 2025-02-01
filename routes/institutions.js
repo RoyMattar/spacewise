@@ -74,7 +74,11 @@ router.patch('/:id', function (req, res, next) {
     const { bio, address, opening_hours } = req.body;
     const institutionId = req.params.id;
     global.db.run(
-        'UPDATE institutions SET bio = COALESCE(?, bio), address = COALESCE(?, address), opening_hours = COALESCE(?, opening_hours) WHERE institution_id = ?',
+        `UPDATE institutions SET
+         bio = COALESCE(?, bio),
+         address = COALESCE(?, address),
+         opening_hours = COALESCE(?, opening_hours)
+         WHERE institution_id = ?`,
         [bio, address, opening_hours, institutionId],
         function (err) {
             if (err) return next(err);
@@ -118,10 +122,14 @@ router.post('/:id/spaces', function (req, res, next) {
 // Route to retrieve all spaces for a specific institution
 router.get('/:id/spaces', function (req, res, next) {
     const institutionId = req.params.id;
-    global.db.all('SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ?', [institutionId], function (err, rows) {
-        if (err) return next(err);
-        res.json(rows);
-    });
+    global.db.all(
+        'SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ?',
+        [institutionId],
+        function (err, rows) {
+            if (err) return next(err);
+            res.json(rows);
+        }
+    );
 
     if (req.session.isAdmin) {
         res.render('spaceManagement');
@@ -133,10 +141,14 @@ router.get('/:id/spaces', function (req, res, next) {
 // Route to retrieve a specific space for a specific institution
 router.get('/:id/spaces/:spaceId', function (req, res, next) {
     const { id: institutionId, spaceId } = req.params;
-    global.db.all('SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ? AND space_id = ?;', [institutionId, spaceId], function (err, rows) {
-        if (err) return next(err);
-        res.json(rows);
-    });
+    global.db.all(
+        'SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ? AND space_id = ?;',
+        [institutionId, spaceId],
+        function (err, rows) {
+            if (err) return next(err);
+            res.json(rows);
+        }
+    );
 });
 
 
@@ -145,7 +157,10 @@ router.patch('/:id/spaces/:spaceId', function (req, res, next) {
     const { name, layoutImage } = req.body;
     const { id: institutionId, spaceId } = req.params;
     global.db.run(
-        'UPDATE spaces SET space_name = COALESCE(?, space_name), layout_image = COALESCE(?, layout_image) WHERE institution_id = ? AND space_id = ?',
+        `UPDATE spaces SET
+         space_name = COALESCE(?, space_name),
+         layout_image = COALESCE(?, layout_image)
+         WHERE institution_id = ? AND space_id = ?`,
         [name, layoutImage, institutionId, spaceId],
         function (err) {
             if (err) return next(err);
