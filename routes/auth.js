@@ -70,12 +70,16 @@ router.get('/register', (req, res) => {
 /**
  * Route to handle registration form submission.
  * Inputs: req.body.username, req.body.password, req.body.role
- * Outputs: Redirects to the login page after successful registration, otherwise re-renders the registration page with an error message
+ * Outputs: Redirects to the welcome page after successful registration, otherwise re-renders the registration page with an error message
  */
 router.post('/register', async (req, res) => {
     const { username, password, role } = req.body;
 
     try {
+        if (!username || !password || !role) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
         // Check if the username already exists
         global.db.get(`SELECT user_id FROM users WHERE username = ?`, [username], async (err, user) => {
             if (err) {
@@ -100,7 +104,7 @@ router.post('/register', async (req, res) => {
                         return res.status(500).json({ error: 'Failed to register user' });
                     }
 
-                    return res.redirect('/login'); // Redirect to login page after successful registration
+                    return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
                 }
             );
         });
