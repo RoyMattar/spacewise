@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const ensureAdmin = require('../middleware/ensure_admin');
+const requireAuth = require('../middleware/require_auth');
 
 // ------ Reservation Management Routes ------
 
 // Route to get all reservations
-router.get('/', function (req, res, next) {
+router.get('/', requireAuth, function (req, res, next) {
     global.db.all(
         'SELECT reservation_id, user_id, seat_id, start_time, end_time, status FROM reservations',
         [],
@@ -18,7 +18,7 @@ router.get('/', function (req, res, next) {
 });
 
 //Route to create a reservation for a seat
-router.post('/', function (req, res, next) {
+router.post('/', requireAuth, function (req, res, next) {
     const { seat_id, user_id, start_time, end_time } = req.body;
     global.db.run(
         'INSERT INTO reservations (seat_id, user_id, start_time, end_time, status) VALUES (?, ?, ?, ?, ?)',
@@ -31,7 +31,7 @@ router.post('/', function (req, res, next) {
 });
 
 //Route to retrieve all reservations for a specific user
-router.get('/:user_id', function (req, res, next) {
+router.get('/:user_id', requireAuth, function (req, res, next) {
     const { user_id } = req.params;
     global.db.all(
         `SELECT reservation_id, seat_id, start_time, end_time, status 
@@ -47,7 +47,7 @@ router.get('/:user_id', function (req, res, next) {
 });
 
 //Route to update a reservation
-router.patch('/:id', function (req, res, next) {
+router.patch('/:id', requireAuth, function (req, res, next) {
     const { start_time, end_time, status } = req.body;
     const { id } = req.params;
     global.db.run(
@@ -61,7 +61,7 @@ router.patch('/:id', function (req, res, next) {
 });
 
 //Route to cancel a reservation
-router.delete('/:id', function (req, res, next) {
+router.delete('/:id', requireAuth, function (req, res, next) {
     const { id } = req.params;
     global.db.run(
         'UPDATE reservations SET status = "cancelled" WHERE reservation_id = ?',

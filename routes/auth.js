@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const requireAuth = require('../middleware/require_auth');
 const saltRounds = 10; // For password hashing
 
 /**
@@ -9,7 +10,9 @@ const saltRounds = 10; // For password hashing
  * Outputs: Renders the 'login' view with an error message if any
  */
 router.get('/login', (req, res) => {
-    res.render('login');
+    const errorMessage = req.session.errorMessage;
+    req.session.errorMessage = null; // Clear error message after displaying
+    res.render('login', { errorMessage });
 });
 
 /**
@@ -125,7 +128,7 @@ router.post('/register', async (req, res) => {
  * Inputs: None
  * Outputs: Renders the home views
  */
-router.get('/home', (req, res) => {
+router.get('/home', requireAuth, (req, res) => {
     const successMessage = req.session.successMessage;
     req.session.successMessage = null; // Clear message after displaying
 
@@ -142,7 +145,7 @@ router.get('/home', (req, res) => {
  * Inputs: None
  * Outputs: Destroys the session and redirects to the login page
  */
-router.post('/logout', (req, res) => {
+router.post('/logout', requireAuth, (req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
