@@ -169,11 +169,67 @@ router.delete('/:id/spaces/:spaceId', function (req, res, next) {
 
 // Route to get all seats within a space
 router.get('/:id/spaces/:spaceId/seats', function (req, res, next) {
+    const { id: institutionId, spaceId } = req.params;
+    global.db.all(
+        'SELECT seat_id, space_id, seat_name, type, facilities, status FROM seats WHERE space_id = ?',
+        [spaceId],
+        function (err, rows) {
+            if (err) return next(err);
+            res.json(rows);
+        }
+    );
+
     if (req.session.isAdmin) {
         res.render('seatManagement');
     } else {
         res.render('seatSelection');
     }
+});
+
+//Route to add a seat to a space with an institution
+router.post('/:id/spaces/:spaceId/seats', function (req, res, next) {
+    const { seat_name, type, facilities, status } = req.body;
+    const { id: institutionId, spaceId } = req.params;
+    global.db.run(
+        'INSERT INTO seats (space_id, seat_name, type, facilities, status) VALUES (?, ?, ?, ?, ?)',
+        [spaceId, seat_name, type, facilities, status],
+        function (err) {
+            if (err) return next(err);
+            res.json({ space_id: this.lastID, message: 'Seat added successfully.' });
+        }
+    );
+});
+
+//Route to update details of a specific seat
+router.patch('/:id/spaces/:spaceId/seats/:seatId', function (req, res, next) {
+    const { seat_name, type, facilities, status } = req.body;
+    const { id: institutionId, spaceId, seatId } = req.params;
+    global.db.run(
+        `UPDATE seats SET
+         seat_name = COALESCE(?, seat_name),
+         type = COALESCE(?, type),
+         facilities = COALESCE(?, facilities),
+         status = COALESCE(?, status)
+         WHERE seat_id = ? AND space_id = ?`,
+        [seat_name, type, facilities, status, seatId, spaceId],
+        function (err) {
+            if (err) return next(err);
+            res.json({ message: 'Seat details updated successfully.' });
+        }
+    );
+});
+
+//Route to remove a seat
+router.delete('/:id/spaces/:spaceId/seats/:seatId', function (req, res, next) {
+    const { id: institutionId, spaceId, seatId } = req.params;
+    global.db.run(
+        'DELETE FROM seats WHERE seat_id = ? AND space_id = ?',
+        [seatId, spaceId],
+        function (err) {
+            if (err) return next(err);
+            res.json({ message: 'Seat deleted successfully.' });
+        }
+    );
 });
 
 module.exports = router;
