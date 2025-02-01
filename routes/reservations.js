@@ -6,6 +6,15 @@ const ensureAdmin = require('../middleware/ensure_admin');
 
 // Route to get all reservations
 router.get('/', function (req, res, next) {
+    global.db.all(
+        'SELECT reservation_id, user_id, seat_id, start_time, end_time, status FROM reservations',
+        [],
+        function (err, rows) {
+            if (err) return next(err);
+            res.json(rows);
+        }
+    );
+
     if (req.session.isAdmin) {
         res.render('reservationManagement');
     } else {
