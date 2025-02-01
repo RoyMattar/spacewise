@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const saltRounds = 10; // For password hashing
 
 /**
  * Route to display the login page.
@@ -19,15 +17,45 @@ router.get('/login', (req, res) => {
  * Inputs: req.body.username, req.body.password
  * Outputs: Redirects to the home page if credentials are valid, otherwise re-renders the login page with an error message
  */
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    if (role === "admin") { // TODO: resolve from DB
-        req.session.isAdmin = true;
-    }
+    try {
+        // Fetch user from SQLite database using parameterized query
+        global.db.get(
+            `SELECT user_id, username, role, password_hash FROM users WHERE username = ?`,
+            [username],
+            async (err, user) => {
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
 
-    req.session.userId = null; // TODO: get from DB
-    return res.redirect('/home');
+                // If no user found
+                if (!user) {
+                    return res.status(401).json({ error: 'User does not exist' });
+                }
+
+                // Compare entered password with stored hashed password
+                const validPassword = await bcrypt.compare(password, user.password_hash);
+                if (!validPassword) {
+                    return res.status(401).json({ error: 'Incorrect password' });
+                }
+
+                // Store user data in session (excluding password hash)
+                req.session.user = {
+                    id: user.user_id,
+                    username: user.username,
+                    role: user.role
+                };
+
+                return res.redirect('/home');
+            }
+        );
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 /**
@@ -44,8 +72,42 @@ router.get('/register', (req, res) => {
  * Inputs: req.body.username, req.body.password, req.body.role
  * Outputs: Redirects to the login page after successful registration, otherwise re-renders the registration page with an error message
  */
-router.post('/register', (req, res) => {
-    res.redirect('/login');
+router.post('/register', async (req, res) => {
+    const { username, password, role } = req.body;
+
+    try {
+        // Check if the username already exists
+        global.db.get(`SELECT user_id FROM users WHERE username = ?`, [username], async (err, user) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+
+            if (user) {
+                return res.status(400).json({ error: 'Username already exists' });
+            }
+
+            // Hash the password
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            // Insert the new user into the database
+            global.db.run(
+                `INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)`,
+                [username, hashedPassword, role],
+                function (err) {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return res.status(500).json({ error: 'Failed to register user' });
+                    }
+
+                    return res.redirect('/login'); // Redirect to login page after successful registration
+                }
+            );
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 /**
@@ -53,8 +115,8 @@ router.post('/register', (req, res) => {
  * Inputs: None
  * Outputs: Renders the home views
  */
-router.get('/home', function (req, res, next) {
-    if (req.session.isAdmin) {
+router.get('/home', (req, res) => {
+    if (req.session.user.role === 'admin') {
         res.render('adminHome');
     } else {
         res.render('studentHome');
