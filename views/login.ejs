@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In - SpaceWise</title>
+  <title>Login - SpaceWise</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -29,7 +29,11 @@
   <main class="container mx-auto py-10 px-6">
     <div class="bg-white p-6 shadow-md rounded-lg max-w-sm mx-auto">
       <h3 class="text-xl font-semibold mb-4">Login</h3>
-      <form id="login-form" action="/login" method="POST">
+
+      <!-- Error message container (Initially hidden) -->
+      <div id="error-message" class="text-red-600 text-sm mb-4 hidden"></div>
+
+      <form id="login-form">
         <label for="username" class="block text-gray-600">Username</label>
         <input type="text" id="username" name="username" class="w-full px-4 py-2 mb-4 border border-gray-300 rounded" placeholder="Enter your username" required>
         
@@ -44,14 +48,52 @@
   </main>
 
   <script>
-    document.getElementById('login-form').addEventListener('submit', function (e) {
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+      e.preventDefault(); // Prevent default form submission
+
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
+      const errorMessage = document.getElementById('error-message');
 
+      // Clear previous error messages
+      errorMessage.textContent = '';
+      errorMessage.classList.add('hidden');
+
+      // Basic validation
       if (!username || !password) {
-        e.preventDefault();
-        alert('Please enter both username and password.');
+        errorMessage.textContent = 'Please enter both username and password.';
+        errorMessage.classList.remove('hidden');
+        return;
       }
+
+      // Disable button to prevent multiple submissions
+      const loginButton = document.querySelector('button[type="submit"]');
+      loginButton.disabled = true;
+      loginButton.textContent = 'Logging in...';
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          window.location.href = '/home'; // Redirect on successful login
+        } else {
+          errorMessage.textContent = result.error || 'Invalid username or password.';
+          errorMessage.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorMessage.textContent = 'Something went wrong. Please try again later.';
+        errorMessage.classList.remove('hidden');
+      }
+
+      // Re-enable button
+      loginButton.disabled = false;
+      loginButton.textContent = 'Login';
     });
   </script>
 </body>

@@ -49,7 +49,7 @@ router.post('/login', async (req, res) => {
                     role: user.role
                 };
 
-                return res.redirect('/home');
+                return res.json({ success: true, redirect: '/home' });
             }
         );
     } catch (error) {

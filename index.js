@@ -9,7 +9,10 @@ const app = express();
 
 // Set up bodyparser
 const bodyParser = require("body-parser");
+// Parse URL-encoded form data (for normal form submissions)
 app.use(bodyParser.urlencoded({ extended: true }));
+// Parse JSON body (for AJAX fetch requests)
+app.use(bodyParser.json());
 
 // Set up EJS
 app.set('view engine', 'ejs'); // set the app to use ejs for rendering
