@@ -41,11 +41,10 @@ router.get('', function (req, res, next) {
         [],
         function (err, rows) {
             if (err) return next(err);
-            res.json(rows);
         }
     );
 
-    res.render('institutionSelection');
+    res.render('institutionSelection', { institutions: rows });
 });
 
 
@@ -59,12 +58,11 @@ router.get('/:id', function (req, res, next) {
         function (err, row) {
             if (err) return next(err);
             if (!row) return res.status(404).json({ message: 'Institution not found.' });
-            res.json(row);
         }
     );
 
     if (req.session.user.role === 'admin') {
-        res.render('institutionManagement');
+        res.render('institutionManagement', { institution: row });
     }
 });
 
@@ -127,14 +125,13 @@ router.get('/:id/spaces', function (req, res, next) {
         [institutionId],
         function (err, rows) {
             if (err) return next(err);
-            res.json(rows);
         }
     );
 
     if (req.session.user.role === 'admin') {
-        res.render('spaceManagement');
+        res.render('spaceManagement', { spaces: rows });
     } else {
-        res.render('spaceSelection');
+        res.render('spaceSelection', { spaces: rows });
     }
 });
 
@@ -190,14 +187,13 @@ router.get('/:id/spaces/:spaceId/seats', function (req, res, next) {
         [spaceId],
         function (err, rows) {
             if (err) return next(err);
-            res.json(rows);
         }
     );
 
     if (req.session.user.role === 'admin') {
-        res.render('seatManagement');
+        res.render('seatManagement', { seats: rows });
     } else {
-        res.render('seatSelection');
+        res.render('seatSelection', { seats: rows });
     }
 });
 

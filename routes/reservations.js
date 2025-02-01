@@ -11,15 +11,10 @@ router.get('/', function (req, res, next) {
         [],
         function (err, rows) {
             if (err) return next(err);
-            res.json(rows);
         }
     );
 
-    if (req.session.user.role === 'admin') {
-        res.render('reservationManagement');
-    } else {
-        res.render('reservationSelection');
-    }
+    res.render('reservationManagement', { reservations: rows });
 });
 
 //Route to create a reservation for a seat
@@ -45,9 +40,10 @@ router.get('/:user_id', function (req, res, next) {
         [user_id],
         function (err, rows) {
             if (err) return next(err);
-            res.json(rows);
         }
     );
+
+    res.render('reservationSelection', { reservations: rows });
 });
 
 //Route to update a reservation
