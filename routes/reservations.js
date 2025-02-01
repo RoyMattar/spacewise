@@ -11,10 +11,9 @@ router.get('/', requireAuth, function (req, res, next) {
         [],
         function (err, rows) {
             if (err) return next(err);
+            res.render('reservationManagement', { reservations: rows });
         }
     );
-
-    res.render('reservationManagement', { reservations: rows });
 });
 
 //Route to create a reservation for a seat
@@ -40,10 +39,9 @@ router.get('/:user_id', requireAuth, function (req, res, next) {
         [user_id],
         function (err, rows) {
             if (err) return next(err);
+            res.render('reservationSelection', { reservations: rows });
         }
     );
-
-    res.render('reservationSelection', { reservations: rows });
 });
 
 //Route to update a reservation

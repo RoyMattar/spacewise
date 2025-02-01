@@ -41,10 +41,9 @@ router.get('', requireAuth, function (req, res, next) {
         [],
         function (err, rows) {
             if (err) return next(err);
+            res.render('institutionSelection', { institutions: rows });
         }
     );
-
-    res.render('institutionSelection', { institutions: rows });
 });
 
 
@@ -58,12 +57,11 @@ router.get('/:id', requireAuth, function (req, res, next) {
         function (err, row) {
             if (err) return next(err);
             if (!row) return res.status(404).json({ message: 'Institution not found.' });
+            if (req.session.user.role === 'admin') {
+                res.render('institutionManagement', { institution: row });
+            }
         }
     );
-
-    if (req.session.user.role === 'admin') {
-        res.render('institutionManagement', { institution: row });
-    }
 });
 
 
@@ -125,14 +123,13 @@ router.get('/:id/spaces', requireAuth, function (req, res, next) {
         [institutionId],
         function (err, rows) {
             if (err) return next(err);
+            if (req.session.user.role === 'admin') {
+                res.render('spaceManagement', { spaces: rows });
+            } else {
+                res.render('spaceSelection', { spaces: rows });
+            }
         }
     );
-
-    if (req.session.user.role === 'admin') {
-        res.render('spaceManagement', { spaces: rows });
-    } else {
-        res.render('spaceSelection', { spaces: rows });
-    }
 });
 
 // Route to retrieve a specific space for a specific institution
@@ -187,14 +184,13 @@ router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) 
         [spaceId],
         function (err, rows) {
             if (err) return next(err);
+            if (req.session.user.role === 'admin') {
+                res.render('seatManagement', { seats: rows });
+            } else {
+                res.render('seatSelection', { seats: rows });
+            }
         }
     );
-
-    if (req.session.user.role === 'admin') {
-        res.render('seatManagement', { seats: rows });
-    } else {
-        res.render('seatSelection', { seats: rows });
-    }
 });
 
 //Route to add a seat to a space with an institution
