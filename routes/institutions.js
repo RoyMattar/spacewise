@@ -63,7 +63,7 @@ router.get('/:id', function (req, res, next) {
         }
     );
 
-    if (req.session.isAdmin) {
+    if (req.session.user.role === 'admin') {
         res.render('institutionManagement');
     }
 });
@@ -131,7 +131,7 @@ router.get('/:id/spaces', function (req, res, next) {
         }
     );
 
-    if (req.session.isAdmin) {
+    if (req.session.user.role === 'admin') {
         res.render('spaceManagement');
     } else {
         res.render('spaceSelection');
@@ -194,7 +194,7 @@ router.get('/:id/spaces/:spaceId/seats', function (req, res, next) {
         }
     );
 
-    if (req.session.isAdmin) {
+    if (req.session.user.role === 'admin') {
         res.render('seatManagement');
     } else {
         res.render('seatSelection');

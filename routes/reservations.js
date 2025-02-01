@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
         }
     );
 
-    if (req.session.isAdmin) {
+    if (req.session.user.role === 'admin') {
         res.render('reservationManagement');
     } else {
         res.render('reservationSelection');
