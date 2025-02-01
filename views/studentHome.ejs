@@ -21,17 +21,21 @@
         <span class="text-xl font-semibold">SpaceWise</span>
       </div>
       <div class="flex items-center space-x-4">
-        <a href="/register" class="text-gray-600 hover:text-black">Admin</a>
-        <a href="/insitutions">
+        <a href="/institutions">
           <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-            View Institutions
+            Institutions
           </button>
         </a>
         <a href="/reservations">
-          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-            View Reservations
+          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Reservations
           </button>
         </a>
+        <form id="logout" action="/logout" method="POST">
+          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
+            Logout
+          </button>
+        </form>
       </div>
     </div>
   </header>
