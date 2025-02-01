@@ -17,14 +17,16 @@
   <header class="bg-white shadow-md">
     <div class="container mx-auto flex items-center justify-between py-4 px-6">
       <div class="flex items-center space-x-2">
-        <a href="/home" class="text-3xl font-bold">𐌂</a> <!-- Clickable Logo -->
-        <span class="text-xl font-semibold">SpaceWise</span>
+        <a href="/home">
+          <!-- Clickable Logo -->
+          <span class="text-xl font-semibold">𐌂 SpaceWise</span>
+        </a>
       </div>
       <div class="flex items-center space-x-4">
         <a href="/institutions">
-            <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
             Institutions
-            </button>
+          </button>
         </a>
         <a href="/reservations">
           <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
@@ -50,7 +52,7 @@
       <ul class="space-y-4">
         <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
           <div>
-            <p class="font-semibold">Room 101 | Seat 5</p>
+            <p class="font-semibold"><% reservations.space_name %></p>
             <p class="text-gray-600 text-sm">Date: 2025-01-25 | Time: 10:00 AM - 12:00 PM</p>
           </div>
           <div class="flex space-x-2">
