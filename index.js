@@ -64,12 +64,12 @@ const reservationRoutes = require('./routes/reservations');
 app.use('/reservations', reservationRoutes);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error(err.stack);
     res.status(500).send('Something went wrong!');
 });
 
 // Make the web application listen for HTTP requests
-app.listen(process.env.PORT || port, () => {
-    console.log(`SpaceWise app listening on port ${process.env.PORT || port}`);
+app.listen(process.env.PORT, () => {
+    console.log(`SpaceWise app listening on port ${process.env.PORT}`);
 });

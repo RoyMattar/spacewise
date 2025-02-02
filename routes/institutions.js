@@ -178,7 +178,7 @@ router.delete('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
 
 // Route to get all seats within a space
 router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
-    const { id: institutionId, spaceId } = req.params;
+    const spaceId = req.params.spaceId;
     global.db.all(
         'SELECT seat_id, space_id, seat_name, type, facilities, status FROM seats WHERE space_id = ?',
         [spaceId],
@@ -196,7 +196,7 @@ router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) 
 //Route to add a seat to a space with an institution
 router.post('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
     const { seat_name, type, facilities, status } = req.body;
-    const { id: institutionId, spaceId } = req.params;
+    const spaceId = req.params.spaceId;
     global.db.run(
         'INSERT INTO seats (space_id, seat_name, type, facilities, status) VALUES (?, ?, ?, ?, ?)',
         [spaceId, seat_name, type, facilities, status],
@@ -210,7 +210,7 @@ router.post('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next)
 //Route to update details of a specific seat
 router.patch('/:id/spaces/:spaceId/seats/:seatId', requireAuth, function (req, res, next) {
     const { seat_name, type, facilities, status } = req.body;
-    const { id: institutionId, spaceId, seatId } = req.params;
+    const { spaceId, seatId } = req.params;
     global.db.run(
         `UPDATE seats SET
          seat_name = COALESCE(?, seat_name),
@@ -228,7 +228,7 @@ router.patch('/:id/spaces/:spaceId/seats/:seatId', requireAuth, function (req, r
 
 //Route to remove a seat
 router.delete('/:id/spaces/:spaceId/seats/:seatId', requireAuth, function (req, res, next) {
-    const { id: institutionId, spaceId, seatId } = req.params;
+    const { spaceId, seatId } = req.params;
     global.db.run(
         'DELETE FROM seats WHERE seat_id = ? AND space_id = ?',
         [seatId, spaceId],
