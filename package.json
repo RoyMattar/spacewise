@@ -15,7 +15,8 @@
         "start": "node index.js",
         "test": "jest --runInBand --detectOpenHandles",
         "lint": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "lint:fix": "eslint . --fix",
+        "ci": "npm run lint && npm test"
     },
     "author": "SpaceWise Team",
     "license": "ISC",
