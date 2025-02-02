@@ -13,7 +13,9 @@
         "clean-db-win": "del database.db",
         "rebuild-db-win": "npm run clean-db-win && npm run build-db",
         "rebuild-db-dummy-win": "npm run clean-db-win && npm run build-db && npm run init-dummy-data",
-        "start": "node index.js"
+        "start": "node index.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
     },
     "author": "SpaceWise Team",
     "license": "ISC",
