@@ -4,150 +4,158 @@ const bcrypt = require('bcrypt');
 const requireAuth = require('../middleware/require_auth');
 const saltRounds = 10; // For password hashing
 
-/**
- * Route to display the login page.
- * Inputs: None
- * Outputs: Renders the 'login' view with an error message if any
- */
-router.get('/login', (req, res) => {
-    const errorMessage = req.session.errorMessage;
-    req.session.errorMessage = null; // Clear error message after displaying
-    res.render('login', { errorMessage });
-});
+function authRouter(db) {
+    /**
+     * Route to display the login page.
+     * Inputs: None
+     * Outputs: Renders the 'login' view with an error message if any
+     */
+    router.get('/login', (req, res) => {
+        const errorMessage = req.session.errorMessage;
+        req.session.errorMessage = null; // Clear error message after displaying
+        res.render('login', { errorMessage });
+    });
 
-/**
- * Route to handle login form submission.
- * Inputs: req.body.username, req.body.password
- * Outputs: Redirects to the home page if credentials are valid, otherwise re-renders the login page with an error message
- */
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    /**
+     * Route to handle login form submission.
+     * Inputs: req.body.username, req.body.password
+     * Outputs: Redirects to the home page if credentials are valid, otherwise re-renders the login page with an error message
+     */
+    router.post('/login', async (req, res) => {
+        if (req.session.user) {
+            return res.status(400).json({ error: "User is already logged in." });
+        }
 
-    try {
-        // Fetch user from SQLite database using parameterized query
-        global.db.get(
-            `SELECT user_id, username, role, password_hash FROM users WHERE username = ?`,
-            [username],
-            async (err, user) => {
+        const { username, password } = req.body;
+
+        try {
+            // Fetch user from SQLite database using parameterized query
+            db.get(
+                `SELECT user_id, username, role, password_hash FROM users WHERE username = ?`,
+                [username],
+                async (err, user) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return res.status(500).json({ error: 'Internal server error' });
+                    }
+
+                    // If no user found
+                    if (!user) {
+                        return res.status(401).json({ error: 'User does not exist' });
+                    }
+
+                    // Compare entered password with stored hashed password
+                    const validPassword = await bcrypt.compare(password, user.password_hash);
+                    if (!validPassword) {
+                        return res.status(401).json({ error: 'Incorrect password' });
+                    }
+
+                    // Store user data in session (excluding password hash)
+                    req.session.user = {
+                        id: user.user_id,
+                        username: user.username,
+                        role: user.role
+                    };
+
+                    // Set success message in session
+                    req.session.successMessage = 'Login successful! Welcome back.';
+
+                    return res.json({ success: true, redirect: '/home' });
+                }
+            );
+        } catch (error) {
+            console.error('Login error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
+    /**
+     * Route to display the registration page.
+     * Inputs: None
+     * Outputs: Renders the 'register' view with an error message if any
+     */
+    router.get('/register', (req, res) => {
+        res.render('register');
+    });
+
+    /**
+     * Route to handle registration form submission.
+     * Inputs: req.body.username, req.body.password, req.body.role
+     * Outputs: Redirects to the welcome page after successful registration, otherwise re-renders the registration page with an error message
+     */
+    router.post('/register', async (req, res) => {
+        const { username, password, role } = req.body;
+
+        try {
+            if (!username || !password || !role) {
+                return res.status(400).json({ error: 'All fields are required' });
+            }
+
+            // Check if the username already exists
+            db.get(`SELECT user_id FROM users WHERE username = ?`, [username], async (err, user) => {
                 if (err) {
                     console.error('Database error:', err);
                     return res.status(500).json({ error: 'Internal server error' });
                 }
 
-                // If no user found
-                if (!user) {
-                    return res.status(401).json({ error: 'User does not exist' });
+                if (user) {
+                    return res.status(400).json({ error: 'Username already exists' });
                 }
 
-                // Compare entered password with stored hashed password
-                const validPassword = await bcrypt.compare(password, user.password_hash);
-                if (!validPassword) {
-                    return res.status(401).json({ error: 'Incorrect password' });
-                }
+                // Hash the password
+                const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-                // Store user data in session (excluding password hash)
-                req.session.user = {
-                    id: user.user_id,
-                    username: user.username,
-                    role: user.role
-                };
+                // Insert the new user into the database
+                db.run(
+                    `INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)`,
+                    [username, hashedPassword, role],
+                    function (err) {
+                        if (err) {
+                            console.error('Database error:', err);
+                            return res.status(500).json({ error: 'Failed to register user' });
+                        }
 
-                // Set success message in session
-                req.session.successMessage = 'Login successful! Welcome back.';
+                        // Set success message in session
+                        req.session.successMessage = 'Registration successful! You can now log in.';
 
-                return res.json({ success: true, redirect: '/home' });
-            }
-        );
-    } catch (error) {
-        console.error('Login error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-/**
- * Route to display the registration page.
- * Inputs: None
- * Outputs: Renders the 'register' view with an error message if any
- */
-router.get('/register', (req, res) => {
-    res.render('register');
-});
-
-/**
- * Route to handle registration form submission.
- * Inputs: req.body.username, req.body.password, req.body.role
- * Outputs: Redirects to the welcome page after successful registration, otherwise re-renders the registration page with an error message
- */
-router.post('/register', async (req, res) => {
-    const { username, password, role } = req.body;
-
-    try {
-        if (!username || !password || !role) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-
-        // Check if the username already exists
-        global.db.get(`SELECT user_id FROM users WHERE username = ?`, [username], async (err, user) => {
-            if (err) {
-                console.error('Database error:', err);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-
-            if (user) {
-                return res.status(400).json({ error: 'Username already exists' });
-            }
-
-            // Hash the password
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-            // Insert the new user into the database
-            global.db.run(
-                `INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)`,
-                [username, hashedPassword, role],
-                function (err) {
-                    if (err) {
-                        console.error('Database error:', err);
-                        return res.status(500).json({ error: 'Failed to register user' });
+                        return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
                     }
+                );
+            });
+        } catch (error) {
+            console.error('Registration error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 
-                    // Set success message in session
-                    req.session.successMessage = 'Registration successful! You can now log in.';
+    /**
+     * Route to display the main home page after login.
+     * Inputs: None
+     * Outputs: Renders the home views
+     */
+    router.get('/home', requireAuth, (req, res) => {
+        const successMessage = req.session.successMessage;
+        req.session.successMessage = null; // Clear message after displaying
 
-                    return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
-                }
-            );
-        });
-    } catch (error) {
-        console.error('Registration error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
+        // Render the relevant home page with a login success message if exists
+        if (req.session.user.role === 'admin') {
+            res.render('adminHome', { successMessage });
+        } else {
+            res.render('studentHome', { successMessage });
+        }
+    });
 
-/**
- * Route to display the main home page after login.
- * Inputs: None
- * Outputs: Renders the home views
- */
-router.get('/home', requireAuth, (req, res) => {
-    const successMessage = req.session.successMessage;
-    req.session.successMessage = null; // Clear message after displaying
+    /**
+     * Route to handle logout.
+     * Inputs: None
+     * Outputs: Destroys the session and redirects to the login page
+     */
+    router.post('/logout', requireAuth, (req, res) => {
+        req.session.destroy();
+        res.redirect('/');
+    });
 
-    // Render the relevant home page with a login success message if exists
-    if (req.session.user.role === 'admin') {
-        res.render('adminHome', { successMessage });
-    } else {
-        res.render('studentHome', { successMessage });
-    }
-});
+    return router;
+}
 
-/**
- * Route to handle logout.
- * Inputs: None
- * Outputs: Destroys the session and redirects to the login page
- */
-router.post('/logout', requireAuth, (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
-});
-
-module.exports = router;
+module.exports = authRouter;

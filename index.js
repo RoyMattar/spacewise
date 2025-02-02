@@ -32,15 +32,14 @@ app.use(session({
 }));
 
 // Set up SQLite
-// Items in the global namespace are accessible throughout the node application
 const sqlite3 = require('sqlite3').verbose();
-global.db = new sqlite3.Database('./database.db', function(err){
+const db = new sqlite3.Database('./database.db', function(err){
     if(err){
         console.error(err);
         process.exit(1); // bail out as we can't connect to the DB
     } else {
         console.log("Database connected");
-        global.db.run("PRAGMA foreign_keys=ON"); // tell SQLite to pay attention to foreign key constraints
+        db.run("PRAGMA foreign_keys=ON"); // tell SQLite to pay attention to foreign key constraints
     }
 });
 
@@ -52,16 +51,16 @@ app.get('/', (req, res) => {
 });
 
 // Routes for login and registration
-const authRoutes = require('./routes/auth');
-app.use('/', authRoutes);
+const authRouter = require('./routes/auth');
+app.use('/', authRouter(db));
 
-// Institution routes
-const institutionRoutes = require('./routes/institutions');
-app.use('/institutions', institutionRoutes);
+// Institutions routes
+const institutionsRouter = require('./routes/institutions');
+app.use('/institutions', institutionsRouter(db));
 
 // Reservations routes
-const reservationRoutes = require('./routes/reservations');
-app.use('/reservations', reservationRoutes);
+const reservationsRouter = require('./routes/reservations');
+app.use('/reservations', reservationsRouter(db));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

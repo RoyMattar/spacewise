@@ -4,7 +4,6 @@
     "description": "Web application for reserving seats in libraries and co-working spaces",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "build-db": "sqlite3 database.db < db_schema.sql",
         "init-dummy-data": "sqlite3 database.db < db_dummy_data.sql",
         "clean-db": "rm database.db",
@@ -14,6 +13,7 @@
         "rebuild-db-win": "npm run clean-db-win && npm run build-db",
         "rebuild-db-dummy-win": "npm run clean-db-win && npm run build-db && npm run init-dummy-data",
         "start": "node index.js",
+        "test": "jest --runInBand --detectOpenHandles",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix"
     },
@@ -37,6 +37,8 @@
     "devDependencies": {
         "@eslint/js": "^9.19.0",
         "eslint": "^9.19.0",
-        "globals": "^15.14.0"
+        "globals": "^15.14.0",
+        "jest": "^29.7.0",
+        "supertest": "^7.0.0"
     }
 }
