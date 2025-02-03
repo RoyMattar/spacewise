@@ -75,13 +75,13 @@
 
       <!-- Seat Management -->
       <h3 class="text-xl font-semibold mb-4">Seat Management</h3>
-      <div class="mb-6">
+      <!-- <div class="mb-6">
         <button class="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-800">Add Seat</button>
         <button class="ml-4 px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-800">Move Seat</button>
         <button class="ml-4 px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-800">Delete Seat</button>
       </div>
 
-      <!-- Facilities Management -->
+      Facilities Management
       <h3 class="text-xl font-semibold mb-4">Update Facilities</h3>
       <form class="mb-6" action="insititutions/3/spaces/:spaceId" method="POST">
         <label for="facilityUpdate" class="block text-sm font-medium text-gray-700">Add/Remove Seat Facilities</label>
@@ -91,19 +91,48 @@
         </button>
       </form>
 
-      <!-- Seat Availability -->
+      Seat Availability
       <h3 class="text-xl font-semibold mb-4">Seat Availability</h3>
       <div class="mb-6">
         <label for="seatSearch" class="block text-sm font-medium text-gray-700">Search Seats</label>
         <input type="text" id="seatSearch" placeholder="Search by seat number or facility" class="mt-2 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-        
-        <!-- <div class="mt-4 seat-grid">
-          <div class="seat available">1</div>
-          <div class="seat unavailable">2</div>
-          <div class="seat available">3</div>
-          <div class="seat unavailable">4</div>
-        </div> -->
+      </div> -->
+      <div class="mb-6">
+        <!-- Seat Label Input -->
+        <label for="seatLabel" class="block text-sm font-medium text-gray-700">Seat Label (e.g., A1, B2)</label>
+        <input type="text" id="seatLabel" placeholder="Enter seat label" class="mt-2 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+      
+        <!-- Seat Type Dropdown -->
+        <label for="seatType" class="block text-sm font-medium text-gray-700 mt-4">Seat Type</label>
+        <select id="seatType" class="mt-2 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+          <option value="chair">Chair</option>
+          <option value="desk">Desk</option>
+          <option value="sofa">Sofa</option>
+        </select>
+      
+        <!-- Facilities Multi-Select -->
+        <label class="block text-sm font-medium text-gray-700 mt-4">Seat Facilities</label>
+        <div class="mt-2 flex flex-wrap">
+          <label class="flex items-center mr-4">
+            <input type="checkbox" name="facility" value="outlet" class="mr-2"> Outlet
+          </label>
+          <label class="flex items-center mr-4">
+            <input type="checkbox" name="facility" value="lamp" class="mr-2"> Lamp
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" name="facility" value="desk-light" class="mr-2"> Desk Light
+          </label>
+        </div>
+      
+        <!-- Add Seat Button -->
+        <button id="addSeatBtn" class="mt-4 px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
+          Add Seat
+        </button>
       </div>
+      
+      <!-- Seat List Preview -->
+      <h3 class="text-xl font-semibold mb-4">Seat Preview</h3>
+      <ul id="seatList" class="bg-gray-50 p-4 rounded-md"></ul>
     </div>
   </main>
 
@@ -185,6 +214,30 @@
         console.error('Upload error:', error);
       }
     });
+
+    document.getElementById('addSeatBtn').addEventListener('click', function () {
+      const seatLabel = document.getElementById('seatLabel').value.trim();
+      const seatType = document.getElementById('seatType').value;
+      const facilities = [...document.querySelectorAll('input[name="facility"]:checked')].map(f => f.value);
+
+      if (!seatLabel) {
+          alert("Please enter a seat label (e.g., A1, B2).");
+          return;
+      }
+
+      const seatList = document.getElementById('seatList');
+
+      // Create list item
+      const seatItem = document.createElement("li");
+      seatItem.className = "p-2 bg-white border rounded-md mb-2";
+      seatItem.innerHTML = `<strong>${seatLabel}</strong> - ${seatType} (${facilities.join(", ") || "No Facilities"})`;
+
+      seatList.appendChild(seatItem);
+
+      // Clear input fields after adding
+      document.getElementById('seatLabel').value = "";
+      document.querySelectorAll('input[name="facility"]').forEach(cb => cb.checked = false);
+  });
   </script>
 </body>
 </html>
