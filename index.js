@@ -7,6 +7,9 @@
 const express = require('express');
 const app = express();
 
+// Set up path
+const path = require('path');
+
 // Set up bodyparser
 const bodyParser = require("body-parser");
 // Parse URL-encoded form data (for normal form submissions)
@@ -16,7 +19,8 @@ app.use(bodyParser.json());
 
 // Set up EJS
 app.set('view engine', 'ejs'); // set the app to use ejs for rendering
-app.use(express.static(__dirname + '/static')); // set location of static files
+app.use(express.static(path.join(__dirname, 'public', 'static'))); // set location of static files
+app.use('/space_layouts', express.static(path.join(__dirname, 'public', 'space_layouts')));
 
 // Set up dotenv for environment variables
 const dotenv = require('dotenv');

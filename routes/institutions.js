@@ -1,7 +1,17 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 const requireAuth = require('../middleware/require_auth');
 
+// Configure storage location for uploaded files
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, path.join(__dirname, "public", "space_layouts")), // Save files in `public/space_layouts/`
+        filename: (req, file, cb) => cb(null, `layout_${Date.now()}_${path.extname(file.originalname)}`) // Rename file
+    })
+});
 
 function institutionsRouter(db) {
     // ------ Institutions Routes ------
@@ -46,7 +56,6 @@ function institutionsRouter(db) {
             }
         );
     });
-
 
     //Route to retrieve details of a specific institution
     router.get('/:id', requireAuth, function (req, res, next) {
@@ -136,30 +145,80 @@ function institutionsRouter(db) {
     // Route to retrieve a specific space for a specific institution
     router.get('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
         const { id: institutionId, spaceId } = req.params;
-        db.all(
+        db.get(
             'SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ? AND space_id = ?;',
             [institutionId, spaceId],
-            function (err, rows) {
+            function (err, row) {
                 if (err) return next(err);
-                res.json(rows);
+                if (!row) return res.status(404).json({ error: "Space not found" });
+
+                // Check if the image file exists
+                const imagePath = row.layout_image ? path.join(__dirname, 'public', row.layout_image) : null;
+                if (!imagePath || !fs.existsSync(imagePath)) {
+                    console.warn(`Missing image file: ${imagePath}`);
+
+                    row.layout_image = null; // Remove broken image reference from result row
+
+                    // Update DB to remove broken image reference
+                    db.run(
+                        `UPDATE spaces SET layout_image = NULL WHERE institution_id = ? AND space_id = ?`,
+                        [institutionId, spaceId],
+                        (updateErr) => {
+                            if (updateErr) console.error("Failed to update DB:", updateErr);
+                        }
+                    );
+                }
+
+                if (req.session.user.role === 'admin') {
+                    res.render('seatManagement', { space: row });
+                } else {
+                    res.render('seatSelection', { space: row });
+                }
             }
         );
     });
 
 
     //Route to update details of a specific space
-    router.patch('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
-        const { name, layoutImage } = req.body;
+    router.patch('/:id/spaces/:spaceId', requireAuth, upload.single('layoutImage'), function (req, res, next) {
+        const { name } = req.body;
         const { id: institutionId, spaceId } = req.params;
-        db.run(
-            `UPDATE spaces SET
-            space_name = COALESCE(?, space_name),
-            layout_image = COALESCE(?, layout_image)
-            WHERE institution_id = ? AND space_id = ?`,
-            [name, layoutImage, institutionId, spaceId],
-            function (err) {
+        // Store the layout_image path in DB as a relative path to have it as a web-accessible path (and a path compatible to any OS)
+        const newLayoutImage = req.file ? `/space_layouts/${req.file.filename}` : null;
+
+        // Get the current image path before updating
+        db.get(
+            'SELECT layout_image FROM spaces WHERE institution_id = ? AND space_id = ?',
+            [institutionId, spaceId],
+            function (err, row) {
                 if (err) return next(err);
-                res.json({ message: 'Space details updated successfully.' });
+
+                const oldImagePath = row ? row.layout_image : null;
+
+                // Update the database with the new image path
+                db.run(
+                    `UPDATE spaces SET
+                    space_name = COALESCE(?, space_name),
+                    layout_image = COALESCE(?, layout_image)
+                    WHERE institution_id = ? AND space_id = ?`,
+                    [name, newLayoutImage, institutionId, spaceId],
+                    function (updateErr) {
+                        if (updateErr) return next(updateErr);
+
+                        // Delete the old image if a new one was uploaded
+                        if (oldImagePath && newLayoutImage) {
+                            const oldFilePath = path.join(__dirname, 'public', oldImagePath);
+                            if (fs.existsSync(oldFilePath)) {
+                                fs.unlink(oldFilePath, (unlinkErr) => {
+                                    if (unlinkErr) console.error("Error deleting old image:", unlinkErr);
+                                    else console.log(`Deleted old image: ${oldFilePath}`);
+                                });
+                            }
+                        }
+
+                        res.json({ message: 'Space details updated successfully.', imagePath: newLayoutImage });
+                    }
+                );
             }
         );
     });
@@ -167,15 +226,36 @@ function institutionsRouter(db) {
     //Route to delete a space
     router.delete('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
         const { id: institutionId, spaceId } = req.params;
-        db.run(
-            'DELETE FROM spaces WHERE institution_id = ? AND space_id = ?',
+        db.get(
+            'SELECT layout_image FROM spaces WHERE institution_id = ? AND space_id = ?;',
             [institutionId, spaceId],
-            function (err) {
+            function (err, row) {
                 if (err) return next(err);
-                res.json({ message: 'Space deleted successfully.' });
+                if (!row) return res.status(404).json({ error: "Space not found" });
+    
+                // Delete the file from disk if it exists
+                if (row.layout_image) {
+                    const filePath = path.join(__dirname, 'public', row.layout_image);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath); // Delete the file
+                        console.log(`Deleted file: ${filePath}`);
+                    }
+                }
+
+                // Delete the entry from the database
+                db.run(
+                    'DELETE FROM spaces WHERE institution_id = ? AND space_id = ?',
+                    [institutionId, spaceId],
+                    function (err) {
+                        if (err) return next(err);
+                        res.json({ message: 'Space deleted successfully.' });
+                    }
+                );
             }
         );
     });
+
+    // ------ Seat Management Routes ------
 
     // Route to get all seats within a space
     router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {

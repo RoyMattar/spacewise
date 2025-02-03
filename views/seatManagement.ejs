@@ -52,15 +52,26 @@
     <h2 class="text-2xl font-semibold mb-6">Manage Space Details</h2>
 
     <div class="bg-white p-6 shadow-md rounded-lg">
+      <!-- Space Preview -->
+      <h3 class="text-xl font-semibold mb-4">Preview Space</h3>
+      <div class="p-4 bg-gray-50 border rounded-md">
+        <p class="text-gray-600 text-sm">Preview the space layout as seen by students.</p>
+        <div class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
+          <% if (space.layout_image) { %>
+            <img id="spacePreview" src="<%= space.layout_image %>" alt="Space Layout" class="w-full h-full object-contain">
+          <% } else { %>
+              <span id="previewPlaceholder" class="text-gray-500">No layout available.</span>
+          <% } %>
+        </div>
+      </div>
+
       <!-- Upload/Edit Layout -->
       <h3 class="text-xl font-semibold mb-4">Upload/Edit Layout</h3>
-      <form class="mb-6" action="/institutions/4/spaces" method="POST">
-        <label for="layoutUpload" class="block text-sm font-medium text-gray-700">Upload Layout Image</label>
-        <input type="file" id="layoutUpload" class="mt-2 block w-full text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-        <button type="submit" class="mt-4 px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-          Save Layout
-        </button>
-      </form>
+      <label for="layoutUpload" class="block text-sm font-medium text-gray-700">Upload Layout Image</label>
+      <input type="file" id="layoutUpload" name="layoutImage" class="mt-2 block w-full text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      <button id="saveLayoutBtn" type="submit" class="mt-4 px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+        Save Layout
+      </button>
 
       <!-- Seat Management -->
       <h3 class="text-xl font-semibold mb-4">Seat Management</h3>
@@ -93,16 +104,87 @@
           <div class="seat unavailable">4</div>
         </div> -->
       </div>
-
-      <!-- Space Preview -->
-      <h3 class="text-xl font-semibold mb-4">Preview Space</h3>
-      <div class="p-4 bg-gray-50 border rounded-md">
-        <p class="text-gray-600 text-sm">Preview the space layout as seen by students.</p>
-        <div class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
-          <span class="text-gray-500">Space layout preview here...</span>
-        </div>
-      </div>
     </div>
   </main>
+
+  <script>
+    document.getElementById('layoutUpload').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const previewImage = document.getElementById('spacePreview');
+        const placeholder = document.getElementById('previewPlaceholder');
+
+        if (previewImage) {
+            previewImage.src = reader.result; // Show the selected image instantly
+            previewImage.classList.remove('hidden');
+        } else {
+            const newImg = document.createElement("img");
+            newImg.id = "spacePreview";
+            newImg.src = reader.result;
+            newImg.classList.add("w-full", "h-full", "object-contain");
+            document.querySelector('.mt-4').innerHTML = '';
+            document.querySelector('.mt-4').appendChild(newImg);
+        }
+
+        if (placeholder) {
+            placeholder.classList.add('hidden'); // Hide placeholder text
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  
+    document.getElementById('saveLayoutBtn').addEventListener('click', async function () {
+      const fileInput = document.getElementById('layoutUpload');
+      const file = fileInput.files[0];
+
+      if (!file) {
+          alert('Please select a file to upload.');
+          return;
+      }
+
+      const formData = new FormData();
+      formData.append('layoutImage', file);
+
+      try {
+        const response = await fetch(window.location.pathname, {
+            method: 'PATCH',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert('Layout updated successfully!');
+
+          // Update the preview with the new image path from the server
+          const previewImage = document.getElementById('spacePreview');
+          const placeholder = document.getElementById('previewPlaceholder');
+
+          if (previewImage) {
+            previewImage.src = result.imagePath;
+            previewImage.classList.remove('hidden');
+          } else {
+            const newImg = document.createElement("img");
+            newImg.id = "spacePreview";
+            newImg.src = result.imagePath;
+            newImg.classList.add("w-full", "h-full", "object-contain");
+            document.querySelector('.mt-4').innerHTML = '';
+            document.querySelector('.mt-4').appendChild(newImg);
+          }
+
+          if (placeholder) {
+            placeholder.classList.add('hidden');
+          }
+        } else {
+          alert('Error updating layout.');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+      }
+    });
+  </script>
 </body>
 </html>
