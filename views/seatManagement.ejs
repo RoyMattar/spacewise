@@ -7,9 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
+    body { font-family: 'Inter', sans-serif; }
     .seat-list li {
       display: flex;
       justify-content: space-between;
@@ -25,14 +23,8 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .unavailable {
-      background-color: #f87171;
-      color: white;
-    }
-    .available {
-      background-color: #34d399;
-      color: white;
-    }
+    .available { background: #28bf4e; color: white; } /* Green */
+    .unavailable { background: #fbbf24; color: white; } /* Warning Orange */
   </style>
 </head>
 <body class="bg-gray-100">
@@ -66,65 +58,48 @@
         </div>
       </div>
 
-      <!-- Upload/Edit Layout -->
-      <h3 class="text-xl font-semibold mb-4">Upload/Edit Layout</h3>
-      <label for="layoutUpload" class="block text-sm font-medium text-gray-700">Upload Layout Image</label>
-      <input type="file" id="layoutUpload" name="layoutImage" class="mt-2 block w-full text-sm text-gray-700 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-      <button id="saveLayoutBtn" class="mt-4 px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-        Save Layout
-      </button>
-      <button id="clearSeatsBtn" class="mt-4 ml-2 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-800">
-        Remove All Seats
-      </button>
+      <!-- Upload Layout -->
+      <h3 class="text-xl font-semibold mb-4">Upload Layout</h3>
+      <input type="file" id="layoutUpload" name="layoutImage" class="mt-2 block w-full p-2 border rounded-md">
 
       <!-- Seat Management -->
-      <h3 class="text-xl font-semibold mb-4">Seat Management</h3>
+      <h3 class="text-xl font-semibold mt-6">Seat Management</h3>
       <div class="mb-6">
-        <!-- Seat Label Input -->
-        <label for="seatLabel" class="block text-sm font-medium text-gray-700">Seat Label (e.g., A1, B2)</label>
-        <input type="text" id="seatLabel" placeholder="Enter seat label" class="mt-2 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
-      
-        <!-- Seat Type Dropdown -->
-        <label for="seatType" class="block text-sm font-medium text-gray-700 mt-4">Seat Type</label>
-        <select id="seatType" class="mt-2 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+        <label for="seatLabel" class="block text-sm font-medium">Seat Label (e.g., A1, B2)</label>
+        <input type="text" id="seatLabel" placeholder="Enter seat label" class="block w-full p-2 border rounded">
+
+        <label for="seatType" class="block text-sm font-medium mt-2">Seat Type</label>
+        <select id="seatType" class="block w-full p-2 border rounded">
           <option value="chair">Chair</option>
           <option value="desk">Desk</option>
           <option value="sofa">Sofa</option>
         </select>
-      
-        <!-- Facilities Multi-Select -->
-        <label class="block text-sm font-medium text-gray-700 mt-4">Seat Facilities</label>
-        <div class="mt-2 flex flex-wrap">
-          <label class="flex items-center mr-4">
-            <input type="checkbox" name="facility" value="outlet" class="mr-2"> Outlet
-          </label>
-          <label class="flex items-center mr-4">
-            <input type="checkbox" name="facility" value="lamp" class="mr-2"> Lamp
-          </label>
-          <label class="flex items-center">
-            <input type="checkbox" name="facility" value="desk-light" class="mr-2"> Desk Light
-          </label>
+
+        <label class="block text-sm font-medium mt-2">Facilities</label>
+        <div class="flex flex-wrap">
+          <label class="flex items-center mr-4"><input type="checkbox" name="facility" value="outlet" class="mr-2"> Outlet</label>
+          <label class="flex items-center mr-4"><input type="checkbox" name="facility" value="lamp" class="mr-2"> Lamp</label>
+          <label class="flex items-center"><input type="checkbox" name="facility" value="desk-light" class="mr-2"> Desk Light</label>
         </div>
-      
-        <!-- Add Seat Button -->
-        <button id="addSeatBtn" class="mt-4 px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
-          Add Seat
-        </button>
+
+        <button id="addSeatBtn" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">Add Seat</button>
+        <button id="clearSeatsBtn" class="mt-4 ml-2 px-4 py-2 bg-yellow-600 text-white rounded">Remove All Seats</button>
       </div>
-      
-      <!-- Seat List Preview -->
-      <h3 class="text-xl font-semibold mb-4">Seat Preview</h3>
+
+      <!-- Seat List -->
+      <h3 class="text-xl font-semibold mt-6">Seat List</h3>
       <ul id="seatList" class="seat-list"></ul>
 
       <!-- Save and Discard Buttons -->
       <div class="mt-6 flex">
-        <button id="saveChangesBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
-        <button id="discardChangesBtn" class="ml-4 px-4 py-2 bg-red-600 text-white rounded">Discard</button>
+        <button id="saveChangesBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Save Changes</button>
+        <button id="discardChangesBtn" class="ml-4 px-4 py-2 bg-red-600 text-white rounded">Discard Changes</button>
       </div>
     </div>
   </main>
 
   <script>
+    // Layout Upload Preview
     document.getElementById('layoutUpload').addEventListener('change', function (event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -152,105 +127,50 @@
       };
       reader.readAsDataURL(file);
     });
-  
-    document.getElementById('saveLayoutBtn').addEventListener('click', async function () {
-      const fileInput = document.getElementById('layoutUpload');
-      const file = fileInput.files[0];
 
-      if (!file) {
-          alert('Please select a file to upload.');
-          return;
-      }
-
-      const formData = new FormData();
-      formData.append('layoutImage', file);
-
-      try {
-        const response = await fetch(window.location.pathname, {
-            method: 'PATCH',
-            body: formData
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          alert('Layout updated successfully!');
-
-          // Update the preview with the new image path from the server
-          const previewImage = document.getElementById('spacePreview');
-          const placeholder = document.getElementById('previewPlaceholder');
-
-          if (previewImage) {
-            previewImage.src = result.imagePath;
-            previewImage.classList.remove('hidden');
-          } else {
-            const newImg = document.createElement("img");
-            newImg.id = "spacePreview";
-            newImg.src = result.imagePath;
-            newImg.classList.add("w-full", "h-full", "object-contain");
-            document.querySelector('.mt-4').innerHTML = '';
-            document.querySelector('.mt-4').appendChild(newImg);
-          }
-
-          if (placeholder) {
-            placeholder.classList.add('hidden');
-          }
-        } else {
-          alert('Error updating layout.');
-        }
-      } catch (error) {
-        console.error('Upload error:', error);
-      }
-    });
-
+    // Add Seat
     document.getElementById('addSeatBtn').addEventListener('click', function () {
-      const seatLabel = document.getElementById('seatLabel').value.trim();
-      const seatType = document.getElementById('seatType').value;
-      const facilities = [...document.querySelectorAll('input[name="facility"]:checked')].map(f => f.value);
-      const seatStatus = "available";  
+        const seatLabel = document.getElementById('seatLabel').value.trim();
+        const seatType = document.getElementById('seatType').value;
+        const facilities = [...document.querySelectorAll('input[name="facility"]:checked')].map(f => f.value);
+        const seatStatus = "available";
 
-      if (!seatLabel) {
-          alert("Please enter a seat label (e.g., A1, B2).");
-          return;
-      }
+        if (!seatLabel) {
+            alert("Please enter a seat label.");
+            return;
+        }
 
       const seatList = document.getElementById('seatList');
 
       // Create list item
       const seatItem = document.createElement("li");
       seatItem.className = "p-2 bg-white border rounded-md mb-2";
-      seatItem.innerHTML = `
-        <span><strong>${seatLabel}</strong> - ${seatType} (${facilities.join(", ") || "No Facilities"})</span>
-        <button class="toggleStatus available toggle-btn" data-status="${seatStatus}">Available</button>
-        <button class="deleteSeat bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-      `;
+        seatItem.innerHTML = `
+            <span><strong>${seatLabel}</strong> - ${seatType} (${facilities.join(", ") || "No Facilities"})</span>
+            <button class="editSeat bg-gray-500 text-white px-3 py-1 rounded">Edit</button>
+            <button class="toggleStatus available toggle-btn" data-status="${seatStatus}">Available</button>
+            <button class="deleteSeat bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+        `;
 
-      seatList.appendChild(seatItem);
+        seatList.appendChild(seatItem);
+        
+        seatItem.querySelector(".toggleStatus").addEventListener("click", function () {
+            this.classList.toggle("available");
+            this.classList.toggle("unavailable");
+            this.innerText = this.classList.contains("available") ? "Available" : "Unavailable";
+        });
 
-      seatItem.querySelector(".toggleStatus").addEventListener("click", function () {
-          this.classList.toggle("available");
-          this.classList.toggle("unavailable");
-          this.innerText = this.classList.contains("available") ? "Available" : "Unavailable";
-      });
-
-      seatItem.querySelector(".deleteSeat").addEventListener("click", function () {
-          seatList.removeChild(seatItem);
-      });
-
-      // Clear input fields after adding
-      document.getElementById('seatLabel').value = "";
-      document.querySelectorAll('input[name="facility"]').forEach(cb => cb.checked = false);
+        seatItem.querySelector(".deleteSeat").addEventListener("click", function () {
+            seatList.removeChild(seatItem);
+        });
     });
 
     document.getElementById('clearSeatsBtn').addEventListener('click', function () {
-      if (confirm("Are you sure you want to remove all seats?")) {
-          document.getElementById('seatList').innerHTML = "";
-      }
+        if (confirm("Are you sure you want to remove all seats?")) {
+            document.getElementById('seatList').innerHTML = "";
+        }
     });
 
-    document.getElementById('saveChangesBtn').addEventListener('click', async function () {
-      alert("Seats saved successfully! (Simulated API call)");
-    });
   </script>
 </body>
 </html>
