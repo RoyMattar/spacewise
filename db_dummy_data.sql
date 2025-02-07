@@ -40,6 +40,27 @@ SET bio = 'Updated bio for the institution',
     opening_hours = '8 AM - 6 PM'
 WHERE institution_id = 2;
 
+-- Fake data for the spaces
+-- INSERT INTO institutions (institution_id, name, location) VALUES
+-- (1, 'Wrigley Building', 'Chicago, IL'),
+-- (2, 'Hyatt Chicago', 'Chicago, IL'),
+-- (3, 'Sears Tower', 'Chicago, IL'),
+-- (4, 'Empire State Building', 'New York, NY'),
+-- (5, 'Golden Gate Center', 'San Francisco, CA');
+
+-- INSERT INTO spaces (id, institution_id, name, room, capacity, floor) VALUES
+-- (1, 1, 'Wrigley Building', 'Room 101', 20, 1),
+-- (2, 1, 'Wrigley Building', 'Room 202', 30, 2),
+-- (3, 2, 'Hyatt Chicago', 'Conference Hall', 50, 2),
+-- (4, 2, 'Hyatt Chicago', 'Boardroom A', 15, 1),
+-- (5, 3, 'Sears Tower', 'First Floor Co-Working Area', 15, 1),
+-- (6, 3, 'Sears Tower', 'Private Office Suite', 5, 10),
+-- (7, 4, 'Empire State Building', 'Sky Lounge', 25, 102),
+-- (8, 4, 'Empire State Building', 'Meeting Room 501', 10, 5),
+-- (9, 5, 'Golden Gate Center', 'Open Workspace', 40, 1),
+-- (10, 5, 'Golden Gate Center', 'Executive Suite', 5, 8);
+
+
 -- Delete the institution and its data
 DELETE FROM institutions WHERE institution_id = 1;
 
