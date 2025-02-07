@@ -28,7 +28,7 @@
             Institutions
           </button>
         </a>
-        <a href="/reservations">
+        <a href="/reservations/:user_id">
           <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
             Reservations
           </button>
@@ -47,25 +47,27 @@
     <h2 class="text-2xl font-semibold mb-6">Select a Space</h2>
     <ul class="space-y-4">
       <!-- Example Space Items -->
+       <!--Template These-->
+      <!-- 
       <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
         <div>
           <h2 class="text-lg font-bold">Wrigley Building</h2>  
           <h3 class="text-sm font-semibold">Room 101</h3>
           <p class="text-gray-600 text-sm">Capacity: 20 | Floor: 1</p>
         </div>
-        <a href="/reservations">
+        <a href="/institutions/20/spaces/:spaceId/seats">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
               Reserve
             </button>
         </a>
-      </li>
+       </li>
       <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
         <div>
           <h2 class="text-lg font-bold">Hyatt Chicago</h2>  
           <h3 class="text-sm font-semibold">Conference Hall</h3>
           <p class="text-gray-600 text-sm">Capacity: 50 | Floor: 2</p>
         </div>
-        <a href="/reservations">
+        <a href="/institutions/20/spaces/:spaceId/seats">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
               Reserve
             </button>
@@ -77,12 +79,30 @@
           <h3 class="text-sm font-semibold">First Floor Co-Working Area</h3>
           <p class="text-gray-600 text-sm">Capacity: 15 | Floor: 1</p>
         </div>
-        <a href="/reservations">
+        <a href="/institutions/20/spaces/:spaceId/seats">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
                 Reserve
             </button>
         </a>
-      </li>
+      </li> -->
+      <% if (spaces.length > 0) { %>
+        <% spaces.forEach(space => { %>
+          <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
+            <div>
+              <h2 class="text-lg font-bold"><%= space.name %></h2>  
+              <h3 class="text-sm font-semibold"><%= space.room %></h3>
+              <p class="text-gray-600 text-sm">Capacity: <%= space.capacity %> | Floor: <%= space.floor %></p>
+            </div>
+            <a href="/institutions/<%= space.institution_id %>/spaces/<%= space.id %>/seats">
+              <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
+                Reserve
+              </button>
+            </a>
+          </li>
+        <% }) %>
+      <% } else { %>
+        <p class="text-gray-600">No spaces available.</p>
+      <% } %>
     </ul>
   </main>
 </body>
