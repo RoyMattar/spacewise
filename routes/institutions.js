@@ -35,11 +35,29 @@ function institutionsRouter(db) {
                     [institution_name, bio, address, opening_hours, admin_id],
                     function (err) {
                         if (err) return next(err);
-                        // Respond with the new institution ID
-                        res.json({
-                            institution_id: this.lastID,
-                            message: 'Institution registered successfully.',
-                        });
+
+                        const institution_id = this.lastID;
+                        console.log(`Created institution in database: id=${institution_id}, name=${institution_name}.`);
+
+                        // Attach the institution_id to the admin user
+                        db.run(
+                            'UPDATE users SET institution_id = ? WHERE user_id = ?',
+                            [institution_id, admin_id],
+                            function (err) {
+                                if (err) {
+                                    console.error('Database error:', err);
+                                    return res.status(500).json({ error: 'Failed to link institution to admin user' });
+                                }
+
+                                console.log(`Linked institution_id=${institution_id} to admin user_id=${admin_id}.`);
+
+                                // Respond with the new institution ID
+                                res.json({
+                                    institution_id: institution_id,
+                                    message: 'Institution registered successfully.',
+                                });
+                            }
+                        );
                     }
                 );
             }
@@ -69,7 +87,7 @@ function institutionsRouter(db) {
                 if (err) return next(err);
                 if (!row) return res.status(404).json({ message: 'Institution not found.' });
                 if (req.session.user.role === 'admin') {
-                    res.render('institutionManagement', { institution: row });
+                    res.render('institutionManagement', { institutionId, institution: row });
                 }
             }
         );
@@ -135,7 +153,7 @@ function institutionsRouter(db) {
             function (err, rows) {
                 if (err) return next(err);
                 if (req.session.user.role === 'admin') {
-                    res.render('spaceManagement', { spaces: rows });
+                    res.render('spaceManagement', { institutionId, spaces: rows});
                 } else {
                     res.render('spaceSelection', { spaces: rows });
                 }
@@ -175,7 +193,7 @@ function institutionsRouter(db) {
                     if (seatErr) return next(seatErr);
 
                     if (req.session.user.role === 'admin') {
-                        res.render('seatManagement', { space, seats });
+                        res.render('seatManagement', { institutionId, space, seats });
                     } else {
                         res.render('seatSelection', { space, seats });
                     }
@@ -269,14 +287,14 @@ function institutionsRouter(db) {
 
     // Route to get all seats within a space
     router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
-        const spaceId = req.params.spaceId;
+        const { id: institutionId, spaceId } = req.params;
         db.all(
             'SELECT seat_id, space_id, seat_name, type, facilities, status FROM seats WHERE space_id = ?',
             [spaceId],
             function (err, rows) {
                 if (err) return next(err);
                 if (req.session.user.role === 'admin') {
-                    res.render('seatManagement', { seats: rows });
+                    res.render('seatManagement', { institutionId, seats: rows });
                 } else {
                     res.render('seatSelection', { seats: rows });
                 }

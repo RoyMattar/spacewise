@@ -57,10 +57,29 @@ function authRouter(db) {
                         role: user.role
                     };
 
-                    // Set success message in session
-                    req.session.successMessage = 'Login successful! Welcome back.';
+                    // Store institution ID in session if user is admin - assume institution was creating when user registered
+                    if (user.role === 'admin') {
+                        db.get(
+                            'SELECT institution_id FROM institutions WHERE admin_id = ?',
+                            [user.user_id],
+                            (err, institution) => {
+                                if (err) {
+                                    console.error('Database error:', err);
+                                    return res.status(500).json({ error: 'Internal server error' });
+                                }
 
-                    return res.json({ success: true, redirect: '/home' });
+                                req.session.user.institutionId = institution ? institution.institution_id : null;
+
+                                // Ensure this is called after the institutionId is set
+                                req.session.successMessage = 'Login successful! Welcome back.';
+                                return res.json({ success: true, redirect: '/home' });
+                            }
+                        );
+                    } else { // For students, respond immediately (no institution needed)
+                        // Set success message in session
+                        req.session.successMessage = 'Login successful! Welcome back.';
+                        return res.json({ success: true, redirect: '/home' });
+                    }
                 }
             );
         } catch (error) {
@@ -84,7 +103,7 @@ function authRouter(db) {
      * Outputs: Redirects to the welcome page after successful registration, otherwise re-renders the registration page with an error message
      */
     router.post('/register', async (req, res) => {
-        const { username, password, role } = req.body;
+        const { username, password, role, institution_name, bio, address, opening_hours } = req.body;
 
         try {
             if (!username || !password || !role) {
@@ -115,10 +134,46 @@ function authRouter(db) {
                             return res.status(500).json({ error: 'Failed to register user' });
                         }
 
-                        // Set success message in session
-                        req.session.successMessage = 'Registration successful! You can now log in.';
+                        console.log(`Created user in database: id=${this.lastID}, username=${username}, role=${role}.`);
 
-                        return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
+                        // If user is an admin, also create their institution
+                        if (role === 'admin') {
+                            const adminId = this.lastID;
+                            db.run(
+                                'INSERT INTO institutions (institution_name, bio, address, opening_hours, admin_id) VALUES (?, ?, ?, ?, ?)',
+                                [institution_name, bio, address, opening_hours, adminId],
+                                function (err) {
+                                    if (err) {
+                                        console.error('Database error:', err);
+                                        return res.status(500).json({ error: 'Failed to create institution' });
+                                    }
+
+                                    const institutionId = this.lastID;
+                                    console.log(`Created institution in database: id=${institutionId}, name=${institution_name}.`);
+
+                                    // Attach the institution_id to the admin user
+                                    db.run(
+                                        'UPDATE users SET institution_id = ? WHERE user_id = ?',
+                                        [institutionId, adminId],
+                                        function (err) {
+                                            if (err) {
+                                                console.error('Database error:', err);
+                                                return res.status(500).json({ error: 'Failed to link institution to admin user' });
+                                            }
+
+                                            console.log(`Linked institution_id=${institutionId} to admin user_id=${adminId}.`);
+
+                                            req.session.successMessage = 'Registration successful! You can now log in.';
+                                            return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
+                                        }
+                                    );
+                                }
+                            );
+                        } else {
+                            // Set success message in session
+                            req.session.successMessage = 'Registration successful! You can now log in.';
+                            return res.json({ success: true, redirect: '/'}); // Redirect to the welcome page after successful registration
+                        }
                     }
                 );
             });
@@ -139,7 +194,7 @@ function authRouter(db) {
 
         // Render the relevant home page with a login success message if exists
         if (req.session.user.role === 'admin') {
-            res.render('adminHome', { successMessage });
+            res.render('adminHome', { successMessage, institutionId: req.session.user.institutionId });
         } else {
             res.render('studentHome', { successMessage });
         }

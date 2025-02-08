@@ -13,17 +13,8 @@
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Navbar -->
-  <header class="bg-white shadow-md">
-    <div class="container mx-auto flex items-center justify-between py-4 px-6">
-      <div class="flex items-center space-x-2">
-        <a href="/home">
-          <!-- Clickable Logo -->
-          <span class="text-xl font-semibold">𐌂 SpaceWise</span>
-        </a>
-      </div>
-    </div>
-  </header>
+  <!-- Admin Navbar -->
+  <%- include('partials/adminNavbar', { institutionId: institutionId }) %>
 
   <!-- Main Content -->
   <main class="container mx-auto py-10 px-6">

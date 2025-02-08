@@ -11,7 +11,7 @@ function reservationsRouter(db) {
             [],
             function (err, rows) {
                 if (err) return next(err);
-                res.render('reservationManagement', { reservations: rows });
+                res.render('reservationManagement', { institutionId: req.session.user.institutionId, reservations: rows });
             }
         );
     });
