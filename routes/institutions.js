@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const requireAuth = require('../middleware/require_auth');
+const ensureCorrectAdmin = require('../middleware/ensure_correct_admin');
 
 // Configure storage location for uploaded files
 const publicPath = path.join(__dirname, "..", "public");
@@ -77,7 +78,7 @@ function institutionsRouter(db) {
     });
 
     //Route to retrieve details of a specific institution
-    router.get('/:id', requireAuth, function (req, res, next) {
+    router.get('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.get(
             `SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions
@@ -145,7 +146,7 @@ function institutionsRouter(db) {
 
 
     // Route to retrieve all spaces for a specific institution
-    router.get('/:id/spaces', requireAuth, function (req, res, next) {
+    router.get('/:id/spaces', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.all(
             'SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ?',
@@ -162,7 +163,7 @@ function institutionsRouter(db) {
     });
 
     // Route to retrieve a specific space for a specific institution
-    router.get('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
+    router.get('/:id/spaces/:spaceId', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { id: institutionId, spaceId } = req.params;
         db.get(
             'SELECT * FROM spaces WHERE institution_id = ? AND space_id = ?;',
@@ -286,7 +287,7 @@ function institutionsRouter(db) {
     // ------ Seat Management Routes ------
 
     // Route to get all seats within a space
-    router.get('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
+    router.get('/:id/spaces/:spaceId/seats', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { id: institutionId, spaceId } = req.params;
         db.all(
             'SELECT seat_id, space_id, seat_name, type, facilities, status FROM seats WHERE space_id = ?',
