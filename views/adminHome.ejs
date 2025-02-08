@@ -41,7 +41,7 @@
       </div>
       <div class="flex items-center space-x-4">
         <a href="/home" class="text-gray-600 hover:text-black">Home</a>
-        <a href="/institutions">
+        <a href="/institutions/2">
           <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
             Institutions
           </button>
@@ -69,14 +69,17 @@
       <!-- Section for managing library spaces -->
       <div class="mb-6">
         <h4 class="text-lg font-semibold">Manage Spaces</h4>
-        <button class="px-4 py-2 text-sm bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
-          Add New Space
-        </button>
-        <button class="px-4 py-2 text-sm bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 ml-4">
-          View Existing Spaces
-        </button>
-        <!--Recommended for Schools-->
-        <a href="/institutions/11/spaces">
+        <a href="/institutions/2/spaces">
+          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
+            Add New Space
+          </button>
+        </a>  
+        <a href="/institutions/3/spaces">
+          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
+            View Existing Spaces
+          </button>
+        </a>              
+        <a href="/institutions/1/spaces/1/seats">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
               Create Space with Layout
             </button>
@@ -93,7 +96,7 @@
       <div class="mb-6">
         <h4 class="text-lg font-semibold">Manage Reservations</h4>
 
-        <a href="/institutions/9/spaces/:spaceId">
+        <a href="/reservations">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
               Reservations
             </button>
