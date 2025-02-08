@@ -42,27 +42,12 @@
       <!-- Section for managing library spaces -->
       <div class="mb-6">
         <h4 class="text-lg font-semibold">Manage Spaces</h4>
-        <a href="/institutions/2/spaces">
+        <a href="/institutions/<%= institutionId %>/spaces">
           <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-            Add New Space
+            Spaces
           </button>
         </a>  
-        <a href="/institutions/3/spaces">
-          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-            View Existing Spaces
-          </button>
-        </a>              
-        <a href="/institutions/1/spaces/1/seats">
-            <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-              Create Space with Layout
-            </button>
-        </a>
-        <!--Recommended for Co-Working Spaces-->
-        <a href="/institutions/10/spaces">
-            <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-              Create a Space without a Layout
-            </button>
-        </a>
+
       </div>
 
       <!-- Section for managing reservations -->
@@ -78,10 +63,10 @@
 
       <!-- Section for managing users -->
       <div class="mb-6">
-        <h4 class="text-lg font-semibold">Admin Profile</h4>
-        <a href="/institutions/8">
+        <h4 class="text-lg font-semibold">Manage Institutions</h4>
+        <a href="/institutions/<%= institutionId %>">
             <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-              View Profile
+              Institutions
             </button>
         </a>
       </div>

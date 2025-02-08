@@ -9,6 +9,8 @@ INSERT INTO users (username, password_hash, role) VALUES
 
 SELECT * FROM users;
 
+DELETE FROM users where institution_id = 5;
+
 -- Authenticate student/admin and return a token
 SELECT user_id, role 
 FROM users 

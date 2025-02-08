@@ -97,15 +97,16 @@ function institutionsRouter(db) {
 
     //Route to update an institution's details
     router.patch('/:id', requireAuth, function (req, res, next) {
-        const { bio, address, opening_hours } = req.body;
+        const { institution_name, bio, address, opening_hours } = req.body;
         const institutionId = req.params.id;
         db.run(
             `UPDATE institutions SET
+            institution_name = COALESCE(?, institution_name),
             bio = COALESCE(?, bio),
             address = COALESCE(?, address),
             opening_hours = COALESCE(?, opening_hours)
             WHERE institution_id = ?`,
-            [bio, address, opening_hours, institutionId],
+            [institution_name, bio, address, opening_hours, institutionId],
             function (err) {
                 if (err) return next(err);
                 res.json({ message: 'Institution details updated successfully.' });
@@ -122,7 +123,14 @@ function institutionsRouter(db) {
             [institutionId],
             function (err) {
                 if (err) return next(err);
-                res.json({ message: 'Institution deleted successfully.' });
+                db.run(
+                    'DELETE FROM users where institution_id = ?',
+                    [institutionId],
+                    function (err) {
+                        if (err) return next(err);
+                        return res.json({ success: true, redirect: '/logout' });
+                    }
+                )
             }
         );
     });
