@@ -11,7 +11,7 @@ const publicPath = path.join(__dirname, "..", "public");
 const upload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => cb(null, path.join(publicPath, "space_layouts")), // Save files in `public/space_layouts/`
-        filename: (req, file, cb) => cb(null, `layout_space_${req.params.spaceId}_${Date.now()}${path.extname(file.originalname)}`) // Rename file to `layout_space_<spaceId>_<date>.png`
+        filename: (req, file, cb) => cb(null, `layout_institution_${req.params.id}_space_${req.params.spaceId}_${Date.now()}${path.extname(file.originalname)}`) // Rename file to `layout_space_<spaceId>_<date>.png`
     })
 });
 
