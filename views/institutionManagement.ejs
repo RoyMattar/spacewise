@@ -81,7 +81,7 @@
     document.getElementById('deleteBtn').addEventListener("click", function () {
       const institutionId = '<%= institutionId %>';
 
-      if (confirm("Are you sure you want to delete this institution? This will also close your account.")) {
+      if (confirm("Are you sure you want to delete this institution?\nThis will also close your account.")) {
         fetch(`/institutions/${institutionId}`, {
           method: 'DELETE'
         })
