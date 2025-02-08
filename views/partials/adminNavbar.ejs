@@ -1,29 +1,30 @@
 <header class="bg-white shadow-md">
 <div class="container mx-auto flex items-center justify-between py-4 px-6">
-    <div class="flex items-center space-x-2">
-    <a href="/home" class="text-xl font-semibold">𐌂 SpaceWise</a>
-    </div>
+    <a href="/home" class="flex items-center space-x-2">
+        <span class="text-xl font-semibold">𐌂 SpaceWise</span>
+        <img src="/favicon.png" alt="Logo" class="h-6 w-auto"> 
+    </a>
     <div class="flex items-center space-x-4">
-    <a href="/institutions/<%= institutionId %>">
-        <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-        Institution
-        </button>
-    </a>
-    <a href="/institutions/<%= institutionId %>/spaces">
-        <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-        Spaces
-        </button>
-    </a>
-    <a href="/reservations">
-        <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-        Reservations
-        </button>
-    </a>
-    <form id="logout" action="/logout" method="POST">
-        <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-        Logout
-        </button>
-    </form>
+        <a href="/institutions/<%= institutionId %>">
+            <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Institution
+            </button>
+        </a>
+        <a href="/institutions/<%= institutionId %>/spaces">
+            <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Spaces
+            </button>
+        </a>
+        <a href="/reservations">
+            <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Reservations
+            </button>
+        </a>
+        <form id="logout" action="/logout" method="POST">
+            <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
+            Logout
+            </button>
+        </form>
     </div>
 </div>
 </header>
