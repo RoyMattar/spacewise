@@ -147,7 +147,10 @@ function institutionsRouter(db) {
             [name, layoutImage, institutionId],
             function (err) {
                 if (err) return next(err);
-                res.json({ space_id: this.lastID, message: 'Space created successfully.' });
+                const spaceId = this.lastID;
+                const message = `Space ${spaceId} - "${name}" created successfully in institution ${institutionId}.`;
+                console.log(message);
+                res.json({ space_id: spaceId, message: message });
             }
         );
     });
@@ -309,6 +312,41 @@ function institutionsRouter(db) {
                 }
             }
         );
+    });
+
+    // Route to get all available seats within a space
+    router.get('/:id/spaces/:spaceId/available-seats', requireAuth, (req, res) => {
+        const { spaceId } = req.params;
+        const { start_time, end_time } = req.query;
+    
+        const query = `
+            SELECT s.seat_id, s.seat_name, s.type, s.facilities
+            FROM seats s
+            WHERE s.space_id = ?
+            AND s.status = 'available'
+            AND s.seat_id NOT IN (
+                SELECT seat_id
+                FROM reservations
+                WHERE status = 'active'
+                AND (
+                    (start_time <= ? AND end_time >= ?)
+                    OR (start_time <= ? AND end_time >= ?)
+                    OR (start_time <= ? AND end_time >= ?)
+                    OR (start_time >= ? AND end_time <= ?)
+                )
+            )
+        `;
+    
+        db.all(query, [
+            spaceId,
+            start_time, start_time, // Overlap at start
+            end_time, end_time, // Overlap at end
+            start_time, end_time, // Contains
+            start_time, end_time // Is contained within
+        ], (err, availableSeats) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            res.json(availableSeats);
+        });
     });
 
     //Route to add a seat to a space with an institution

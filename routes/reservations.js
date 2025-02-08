@@ -18,7 +18,9 @@ function reservationsRouter(db) {
 
     //Route to create a reservation for a seat
     router.post('/', requireAuth, function (req, res, next) {
-        const { seat_id, user_id, start_time, end_time } = req.body;
+        const { seat_id, start_time, end_time } = req.body;
+        const user_id = req.session.user.id;
+
         db.run(
             'INSERT INTO reservations (seat_id, user_id, start_time, end_time, status) VALUES (?, ?, ?, ?, ?)',
             [seat_id, user_id, start_time, end_time, 'active'],

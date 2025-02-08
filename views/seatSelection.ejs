@@ -43,29 +43,130 @@
   </header>
 
   <!-- Main Content -->
-  <main class="container mx-auto py-10 px-6">
+  <main class="container mx-auto py-6 px-6">
     <h2 class="text-2xl font-semibold mb-6">Select a Seat</h2>
+    
+    <!-- Seat Selection -->
+    <div class="bg-white p-6 shadow-md rounded-lg">
+      <!-- Layout Image Section -->
+      <div class="bg-gray-200 border rounded-md mb-6 h-96 flex items-center justify-center">
+        <% if (space.layout_image) { %>
+          <img src="<%= space.layout_image %>" alt="Layout View" class="w-full h-full object-contain">
+        <% } else { %>
+          <p class="text-gray-500">No layout available for this space.</p>
+        <% } %>
+      </div>
 
-    <!-- Layout Image Section -->
-    <div class="bg-white shadow-md rounded-lg p-4 mb-6">
-      <img src="https://via.placeholder.com/600x400" alt="Layout View" class="w-full h-auto rounded">
-    </div>
+      <!-- Date Selection -->
+      <label for="reservationDate" class="block text-lg font-semibold mb-2">Select Date</label>
+      <input type="date" id="reservationDate" class="w-full p-2 border rounded mb-4 focus:ring focus:ring-purple-600" required>
 
-    <!-- Seat Selection Dropdown -->
-    <div class="bg-white shadow-md rounded-lg p-4">
+      <!-- Time Slot Selection -->
+      <label for="timeSlot" class="block text-lg font-semibold mb-2">Select Time Slot</label>
+      <select id="timeSlot" class="w-full p-2 border mb-6 rounded focus:ring focus:ring-purple-600" required>
+        <option value="">Select a time slot</option>
+        <% for (let hour = 8; hour < 20; hour += 2) { %>
+          <option value="<%= hour %>"><%= `${hour}:00 - ${hour + 2}:00` %></option>
+        <% } %>
+      </select>
+
+      <!-- Filter Section -->
+      <h3 class="text-lg font-semibold mb-2">Filter by Facilities</h3>
+      <div class="flex flex-wrap mb-6">
+        <label class="flex items-center mr-4"><input type="checkbox" class="facility-filter mr-2" value="outlet">Outlet</label>
+        <label class="flex items-center mr-4"><input type="checkbox" class="facility-filter mr-2" value="lamp">Lamp</label>
+        <label class="flex items-center"><input type="checkbox" class="facility-filter mr-2" value="desk-light">Desk Light</label>
+      </div>
+
+      <!-- Dropdown menu -->
       <label for="seatSelection" class="block text-lg font-semibold mb-2">Available Seats</label>
       <select id="seatSelection" class="w-full p-2 border border-gray-300 rounded focus:ring focus:ring-purple-600">
         <option value="">Select a seat</option>
-        <option value="seat1">Seat 1</option>
-        <option value="seat2">Seat 2</option>
-        <option value="seat3">Seat 3</option>
+        <% seats.forEach(seat => { %>
+          <% if (seat.status === 'available') { %>
+            <option value="<%= seat.seat_id %>"><%= seat.seat_name %> - <%= seat.type %> (<%= seat.facilities || "No Facilities" %>)</option>
+          <% } %>
+        <% }); %>
       </select>
-      <a href="/reservations">
-      <button class="mt-4 w-full px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-        Confirm Seat
+
+      <!-- Reserve Button -->
+      <button id="reserveSeatBtn" class="mt-6 w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+        Reserve Seat
       </button>
       </a>
     </div>
   </main>
+
+  <script>
+    const reservationDate = document.getElementById('reservationDate');
+    const timeSlot = document.getElementById('timeSlot');
+    const seatSelection = document.getElementById('seatSelection');
+
+    // Fetch available seats when date and time are selected
+    function fetchAvailableSeats() {
+      const date = reservationDate.value;
+      const startHour = timeSlot.value;
+      const institutionId = '<%= space.institution_id %>';
+      const spaceId = '<%= space.space_id %>';
+
+      if (!date || !startHour) return;
+
+      const startTime = `${date}T${String(startHour).padStart(2, '0')}:00:00`;
+      const endTime = `${date}T${String(+startHour + 2).padStart(2, '0')}:00:00`;
+
+      fetch(`/institutions/${institutionId}/spaces/${spaceId}/available-seats?start_time=${startTime}&end_time=${endTime}`)
+      .then(response => response.json())
+      .then(seats => {
+        seatSelection.innerHTML = '<option value="">Select a seat</option>';
+        seats.forEach(seat => {
+          seatSelection.innerHTML += `<option value="${seat.seat_id}">${seat.seat_name} - ${seat.type} (${seat.facilities || "No Facilities"})</option>`;
+        });
+      })
+      .catch(error => console.error('Error fetching seats:', error));
+    }
+
+    // Trigger fetch when date or time changes
+    reservationDate.addEventListener('change', fetchAvailableSeats);
+    timeSlot.addEventListener('change', fetchAvailableSeats);
+
+    // Filter seats based on facilities
+    document.querySelectorAll('.facility-filter').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const selectedFacilities = Array.from(document.querySelectorAll('.facility-filter:checked')).map(cb => cb.value);
+        const options = seatSelection.options;
+
+        for (let i = 1; i < options.length; i++) {
+          const seatFacilities = options[i].textContent.toLowerCase();
+          options[i].style.display = selectedFacilities.every(facility => seatFacilities.includes(facility)) ? '' : 'none';
+        }
+      });
+    });
+
+    // Reservation Submission
+    document.getElementById('reserveSeatBtn').addEventListener('click', () => {
+      const seatId = seatSelection.value;
+      const date = reservationDate.value;
+      const startHour = timeSlot.value;
+
+      if (!seatId || !date || !startHour) {
+        alert('Please select date, time, and seat.');
+        return;
+      }
+
+      const startTime = `${date}T${String(startHour).padStart(2, '0')}:00:00`;
+      const endTime = `${date}T${String(+startHour + 2).padStart(2, '0')}:00:00`;
+
+      fetch('/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seat_id: seatId, start_time: startTime, end_time: endTime })
+      })
+      .then(res => res.json())
+      .then(response => {
+        alert('Reservation successful!');
+      })
+      .catch(error => alert('Error making reservation.'));
+    });
+  </script>
 </body>
 </html>
