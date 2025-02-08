@@ -31,20 +31,19 @@
         </div>
         <div class="mb-4">
           <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
-          <textarea id="bio" rows="3" value="<%= institution.bio %>"class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600"></textarea>
+          <textarea id="bio" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600"><%= institution.bio || '' %></textarea>
         </div>
         <div class="mb-6">
           <label for="openingHours" class="block text-sm font-medium text-gray-700">Opening Hours</label>
           <input type="text" id="openingHours" value="<%= institution.opening_hours %>" placeholder="e.g., Mon-Fri: 9AM - 5PM" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
         </div>
-        <button id="saveChangesBtn" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800 mb-4">
+        <button type="button" id="saveChangesBtn" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800 mb-4">
           Save Changes
         </button>
-      <hr class="my-6">
-          <button id="deleteBtn" class="w-full px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
-              Delete Institution
-          </button>
-      </a>
+        <hr class="my-6">
+        <button type="button" id="closeBtn" class="w-full px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+          Close Institution
+        </button>
     </div>
   </main>
   <script>
@@ -78,10 +77,10 @@
       });
     });
 
-    document.getElementById('deleteBtn').addEventListener("click", function () {
+    document.getElementById('closeBtn').addEventListener("click", function () {
       const institutionId = '<%= institutionId %>';
 
-      if (confirm("Are you sure you want to delete this institution?\nThis will also close your account.")) {
+      if (confirm("Are you sure you want to close this institution?\nThis action is permanent and will also close your account.")) {
         fetch(`/institutions/${institutionId}`, {
           method: 'DELETE'
         })

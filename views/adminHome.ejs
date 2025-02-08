@@ -35,38 +35,49 @@
 
   <!-- Admin Content -->
   <main class="container mx-auto py-10 px-6">
-    <div class="bg-white p-6 shadow-md rounded-lg">
-      <h3 class="text-xl font-semibold mb-4">Admin Dashboard</h3>
-      <p class="text-gray-600 text-sm mb-4">Welcome to the admin dashboard. Use the options below to manage the library spaces, reservations, and users.</p>
-
-      <!-- Section for managing library spaces -->
-      <div class="mb-6">
-        <h4 class="text-lg font-semibold">Manage Spaces</h4>
-        <a href="/institutions/<%= institutionId %>/spaces">
-          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-            Spaces
-          </button>
-        </a>  
-
+    <h3 class="text-xl font-semibold mb-2">Admin Dashboard</h3>
+    <p class="text-gray-600 text-sm mb-6">Welcome to the admin dashboard. Use the options below to manage your institution and the spaces and reservations within it.</p>
+    
+    <!-- Section for managing the institution -->
+    <div class="bg-white p-6 mb-6 shadow-md rounded-lg flex items-center">
+      <div class="ml-4 flex-1">
+        <h4 class="text-lg font-semibold">Manage Your Institution</h4>
+        <p class="text-gray-600 text-sm">Edit the details of your institution or close your account.</p>
       </div>
-
-      <!-- Section for managing reservations -->
-      <div class="mb-6">
-        <h4 class="text-lg font-semibold">Manage Reservations</h4>
-
-        <a href="/reservations">
-            <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-              Reservations
-            </button>
+      <div class="ml-4">
+        <a href="/institutions/<%= institutionId %>">
+          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Manage
+          </button>
         </a>
       </div>
+    </div>
 
-      <!-- Section for managing users -->
-      <div class="mb-6">
-        <h4 class="text-lg font-semibold">Manage Institutions</h4>
-        <a href="/institutions/<%= institutionId %>">
-            <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-              Institutions
+    <!-- Section for managing spaces -->
+    <div class="bg-white p-6 mb-6 shadow-md rounded-lg flex items-center">
+      <div class="ml-4 flex-1">
+        <h4 class="text-lg font-semibold">Manage Spaces</h4>
+        <p class="text-gray-600 text-sm">Edit the spaces within your institution or create a new one.</p>
+      </div>
+      <div class="ml-4">
+        <a href="/institutions/<%= institutionId %>/spaces">
+          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+            Manage
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <!-- Section for managing reservations -->
+    <div class="bg-white p-6 mb-6 shadow-md rounded-lg flex items-center">
+      <div class="ml-4 flex-1">
+        <h4 class="text-lg font-semibold">Manage Reservations</h4>
+        <p class="text-gray-600 text-sm">See all the reservations made in your institution with an option to override them.</p>
+      </div>
+      <div class="ml-4">
+        <a href="/reservations">
+            <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
+              Manage
             </button>
         </a>
       </div>
