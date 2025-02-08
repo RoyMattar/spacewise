@@ -50,6 +50,19 @@
             <input type="radio" id="role-admin" name="role" value="admin" class="mr-2">
             <label for="role-admin" class="text-gray-700">Admin</label>
         </div>
+
+        <!-- Admin-specific Fields (Hidden by Default) -->
+        <div id="admin-fields" class="hidden">
+          <label for="institution-name" class="block text-gray-600">Institution Name</label>
+          <input type="text" id="institution-name" name="institution_name" class="w-full px-4 py-2 mb-4 border border-gray-300 rounded" placeholder="Institution Name">
+
+          <label for="institution-bio" class="block text-gray-600">Institution Bio</label>
+          <textarea id="institution-bio" name="bio" class="w-full px-4 py-2 mb-4 border border-gray-300 rounded" placeholder="Short description"></textarea>
+
+          <label for="opening-hours" class="block text-gray-600">Opening Hours</label>
+          <input type="text" id="opening-hours" name="opening_hours" class="w-full px-4 py-2 mb-4 border border-gray-300 rounded" placeholder="e.g., Mon-Fri 9AM-5PM">
+        </div>
+
         <!-- Submit Button -->
         <button type="submit" class="w-full px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
           Register
@@ -59,6 +72,14 @@
   </main>
 
   <script>
+    // Toggle Admin Fields Based on Role Selection
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        const adminFields = document.getElementById('admin-fields');
+        adminFields.classList.toggle('hidden', this.value !== 'admin');
+      });
+    });
+
     document.getElementById('register-form').addEventListener('submit', async function (e) {
       e.preventDefault(); // Prevent default form submission
 
@@ -67,6 +88,11 @@
       const role = document.querySelector('input[name="role"]:checked')?.value;
       const errorMessage = document.getElementById('error-message');
 
+      // Admin-specific fields
+      const institution_name = document.getElementById('institution-name')?.value.trim();
+      const bio = document.getElementById('institution-bio')?.value.trim();
+      const opening_hours = document.getElementById('opening-hours')?.value.trim();
+
       // Clear previous error messages
       errorMessage.textContent = '';
       errorMessage.classList.add('hidden');
@@ -74,6 +100,12 @@
       // Basic validation
       if (!username || !password || !role) {
         errorMessage.textContent = 'Please fill in all fields.';
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      if (role === 'admin' && !institution_name) {
+        errorMessage.textContent = 'Institution name is required for admin registration.';
         errorMessage.classList.remove('hidden');
         return;
       }
@@ -87,7 +119,14 @@
         const response = await fetch('/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, role }),
+          body: JSON.stringify({
+            username,
+            password,
+            role,
+            institution_name: role === 'admin' ? institution_name : null,
+            bio: role === 'admin' ? bio : null,
+            opening_hours: role === 'admin' ? opening_hours : null,
+          }),
         });
 
         const result = await response.json();
