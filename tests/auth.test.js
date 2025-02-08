@@ -103,8 +103,10 @@ describe('Auth Routes', () => {
     });
 
     test('Should successfully register an admin user', async () => {
-        const res = await agent.post('/register').send(ADMIN_USER);
-        
+        let adminRegister = ADMIN_USER;
+        adminRegister.institution_name = "library";
+        const res = await agent.post('/register').send(adminRegister);
+
         expect(res.statusCode).toBe(200);
         expect(res.body.success).toBe(true);
         expect(res.body.redirect).toBe('/');
