@@ -11,7 +11,7 @@ CREATE TABLE users (
     role TEXT NOT NULL CHECK(role IN ('admin', 'student')), -- Role determines subclass
     institution_id INTEGER UNIQUE DEFAULT NULL, -- Only for admins, 1-to-1 with institution
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE SET NULL
+    FOREIGN KEY (institution_id) REFERENCES institutions(institution_id) ON DELETE CASCADE -- Delete the admin user if its institution was deleted
 );
 
 -- Enforce: Only admins can be assigned an institution_id
@@ -31,7 +31,7 @@ CREATE TABLE institutions (
     address TEXT,
     opening_hours TEXT,
     admin_id INTEGER UNIQUE NOT NULL, -- Foreign key linking to users.user_id, 1-to-1 with admin
-    FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE -- Delete the institution if its admin user was deleted
 );
 
 -- Enforce: Institutions can refer only to admins
