@@ -13,34 +13,8 @@
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Navbar -->
-  <header class="bg-white shadow-md">
-    <div class="container mx-auto flex items-center justify-between py-4 px-6">
-      <div class="flex items-center space-x-2">
-        <a href="/home">
-          <!-- Clickable Logo -->
-          <span class="text-xl font-semibold">𐌂 SpaceWise</span>
-        </a>
-      </div>
-      <div class="flex items-center space-x-4">
-        <a href="/institutions">
-          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-            Institutions
-          </button>
-        </a>
-        <a href="/reservations">
-          <button class="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800">
-            Reservations
-          </button>
-        </a>
-        <form id="logout" action="/logout" method="POST">
-          <button class="px-4 py-2 text-sm text-white bg-black rounded hover:bg-gray-800">
-            Logout
-          </button>
-        </form>
-      </div>
-    </div>
-  </header>
+  <!-- Student Navbar -->
+  <%- include('partials/studentNavbar') %>
 
   <!-- Main Content -->
   <main class="container mx-auto py-6 px-6">
