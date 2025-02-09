@@ -166,7 +166,14 @@ function institutionsRouter(db) {
                 if (req.session.user.role === 'admin') {
                     res.render('spaceManagement', { institutionId, spaces: rows});
                 } else {
-                    res.render('spaceSelection', { spaces: rows });
+                    db.get(
+                        'SELECT institution_name FROM institutions WHERE institution_id = ?',
+                        [institutionId],
+                        function (err, institution) {
+                            if (err) return next(err);
+                            res.render('spaceSelection', { spaces: rows, institutionName: institution.institution_name});
+                        }
+                    );
                 }
             }
         );
