@@ -96,7 +96,7 @@ function institutionsRouter(db) {
 
 
     //Route to update an institution's details
-    router.patch('/:id', requireAuth, function (req, res, next) {
+    router.patch('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { institution_name, bio, address, opening_hours } = req.body;
         const institutionId = req.params.id;
         db.run(
@@ -116,7 +116,7 @@ function institutionsRouter(db) {
 
 
     //Route to delete an institution
-    router.delete('/:id', requireAuth, function (req, res, next) {
+    router.delete('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.run(
             'DELETE FROM institutions WHERE institution_id = ?',
@@ -186,16 +186,16 @@ function institutionsRouter(db) {
                     // Check if the image file exists and remove broken image reference if it does not
                     const imagePath = path.join(publicPath, space.layout_image);
                     if (!fs.existsSync(imagePath)) {
-                    console.warn(`Missing image file: ${imagePath}`);
+                        console.warn(`Missing image file: ${imagePath}`);
                         space.layout_image = null;
 
-                    db.run(
-                        `UPDATE spaces SET layout_image = NULL WHERE institution_id = ? AND space_id = ?`,
-                        [institutionId, spaceId],
-                        (updateErr) => {
+                        db.run(
+                            `UPDATE spaces SET layout_image = NULL WHERE institution_id = ? AND space_id = ?`,
+                            [institutionId, spaceId],
+                            (updateErr) => {
                                 if (updateErr) console.error("Failed to update DB: ", updateErr);
-                        }
-                    );
+                            }
+                        );
                     }
                 }
 
@@ -215,7 +215,7 @@ function institutionsRouter(db) {
 
 
     //Route to update details of a specific space
-    router.patch('/:id/spaces/:spaceId', requireAuth, upload.single('layoutImage'), function (req, res, next) {
+    router.patch('/:id/spaces/:spaceId', requireAuth, ensureCorrectAdmin, upload.single('layoutImage'), function (req, res, next) {
         const { spaceName } = req.body || null;
         const { id: institutionId, spaceId } = req.params;
         // Store the layout_image path in DB as a relative path to have it as a web-accessible path (and a path compatible to any OS)
@@ -351,7 +351,7 @@ function institutionsRouter(db) {
     });
 
     //Route to add a seat to a space with an institution
-    router.post('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
+    router.post('/:id/spaces/:spaceId/seats', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { seat_name, type, facilities, status } = req.body;
         const spaceId = req.params.spaceId;
 
@@ -373,7 +373,7 @@ function institutionsRouter(db) {
     });
 
     //Route to update details of a specific seat
-    router.patch('/:id/spaces/:spaceId/seats/:seatId', requireAuth, function (req, res, next) {
+    router.patch('/:id/spaces/:spaceId/seats/:seatId', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { seat_name, type, facilities, status } = req.body;
         const { spaceId, seatId } = req.params;
 
@@ -397,7 +397,7 @@ function institutionsRouter(db) {
     });
 
     //Route to remove a seat
-    router.delete('/:id/spaces/:spaceId/seats/:seatId', requireAuth, function (req, res, next) {
+    router.delete('/:id/spaces/:spaceId/seats/:seatId', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { spaceId, seatId } = req.params;
         db.run(
             'DELETE FROM seats WHERE seat_id = ? AND space_id = ?',
@@ -410,7 +410,7 @@ function institutionsRouter(db) {
     });
 
     // Route to clear all seats within a space
-    router.delete('/:id/spaces/:spaceId/seats', requireAuth, function (req, res, next) {
+    router.delete('/:id/spaces/:spaceId/seats', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { spaceId } = req.params;
         db.get('SELECT COUNT(*) as count FROM seats WHERE space_id = ?', [spaceId], (err, result) => {
             if (err) return next(err);
