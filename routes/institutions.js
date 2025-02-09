@@ -139,7 +139,7 @@ function institutionsRouter(db) {
     // ------ Space Management Routes ------
 
     //Route to create a space for a specific institution
-    router.post('/:id/spaces', requireAuth, function (req, res, next) {
+    router.post('/:id/spaces', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { name, layoutImage } = req.body;
         const institutionId = req.params.id;
         db.run(
@@ -148,9 +148,8 @@ function institutionsRouter(db) {
             function (err) {
                 if (err) return next(err);
                 const spaceId = this.lastID;
-                const message = `Space ${spaceId} - "${name}" created successfully in institution ${institutionId}.`;
-                console.log(message);
-                res.json({ space_id: spaceId, message: message });
+                console.log(`Space ${spaceId} - "${name}" created successfully in institution ${institutionId}.`);
+                res.redirect(`/institutions/${institutionId}/spaces/${spaceId}`); // Redirect to the new space's edit page
             }
         );
     });
@@ -160,7 +159,7 @@ function institutionsRouter(db) {
     router.get('/:id/spaces', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.all(
-            'SELECT space_id, space_name, layout_image FROM spaces WHERE institution_id = ?',
+            'SELECT * FROM spaces WHERE institution_id = ?',
             [institutionId],
             function (err, rows) {
                 if (err) return next(err);
@@ -183,21 +182,21 @@ function institutionsRouter(db) {
                 if (err) return next(err);
                 if (!space) return res.status(404).json({ error: "Space not found" });
 
-                // Check if the image file exists
-                const imagePath = space.layout_image ? path.join(publicPath, space.layout_image) : null;
-                if (!imagePath || !fs.existsSync(imagePath)) {
+                if (space.layout_image) {
+                    // Check if the image file exists and remove broken image reference if it does not
+                    const imagePath = path.join(publicPath, space.layout_image);
+                    if (!fs.existsSync(imagePath)) {
                     console.warn(`Missing image file: ${imagePath}`);
+                        space.layout_image = null;
 
-                    space.layout_image = null; // Remove broken image reference from result space
-
-                    // Update DB to remove broken image reference
                     db.run(
                         `UPDATE spaces SET layout_image = NULL WHERE institution_id = ? AND space_id = ?`,
                         [institutionId, spaceId],
                         (updateErr) => {
-                            if (updateErr) console.error("Failed to update DB:", updateErr);
+                                if (updateErr) console.error("Failed to update DB: ", updateErr);
                         }
                     );
+                    }
                 }
 
                 // Fetch seats of the space
@@ -264,7 +263,7 @@ function institutionsRouter(db) {
     });
 
     //Route to delete a space
-    router.delete('/:id/spaces/:spaceId', requireAuth, function (req, res, next) {
+    router.delete('/:id/spaces/:spaceId', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const { id: institutionId, spaceId } = req.params;
         db.get(
             'SELECT layout_image FROM spaces WHERE institution_id = ? AND space_id = ?;',
@@ -288,7 +287,9 @@ function institutionsRouter(db) {
                     [institutionId, spaceId],
                     function (err) {
                         if (err) return next(err);
-                        res.json({ message: 'Space deleted successfully.' });
+                        const message = `Space ${spaceId} deleted successfully.`;
+                        console.log(message);
+                        res.json({ message: message });
                     }
                 );
             }
