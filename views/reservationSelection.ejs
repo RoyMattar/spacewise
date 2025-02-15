@@ -24,88 +24,63 @@
     <!-- Active Reservations -->
     <section class="mb-10">
       <h3 class="text-lg font-semibold mb-4">Active Reservations</h3>
-      <!--Template This-->
       <ul class="space-y-4">
-        <!-- <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
-          <div>
-            <p class="font-semibold">Mudd Library | Seat 1</p>
-            <p class="text-gray-600 text-sm">Date: 2025-01-25 | Time: 10:00 AM - 12:00 PM</p>
-          </div>
-          <div class="flex space-x-2">
-            <form action="/reservations/13" method="post">
-            <button class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
-              Confirm
-            </button>
-            </form>
-            <form action="/reservations/14" method="post">
-            <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
-              Cancel
-            </button>
-            </form>
-          </div>
-        </li> -->
-        <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
-          <div>
-            <p class="font-semibold">Library Study Area | Seat 2</p>
-            <p class="text-gray-600 text-sm">Date: 2025-01-28 | Time: 2:00 PM - 4:00 PM</p>
-          </div>
-          <div class="flex space-x-2">
-            <form action="/reservations/13" method="post">
-              <button class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
-                Confirm
-              </button>
-              </form>
-              <form action="/reservations/14" method="post">
-              <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
-                Cancel
-              </button>
-              </form>
-          </div>
-        </li> 
-        <% reservations.forEach(reservation => { %>
+        <% activeReservations.forEach(res => { %>
           <li class="bg-white shadow-md rounded-lg p-4 flex justify-between items-center">
             <div>
-              <p class="font-semibold"><%= reservation.location %> | Seat <%= reservation.seat %></p>
-              <p class="text-gray-600 text-sm">Date: <%= reservation.date %> | Time: <%= reservation.start_time %> - <%= reservation.end_time %></p>
+              <p class="font-semibold mb-2"><%= res.institution_name %> | <%= res.space_name %> | Seat: <%= res.seat_name %></p>
+              <p class="text-gray-500 text-sm mb-2">Type: <%= res.type || 'N/A' %> | Facilities: <%= res.facilities || 'None' %></p>
+              <p class="text-gray-600 text-sm">
+                Date: <%= res.date %> | Time: <%= res.start_time %> - <%= res.end_time %>
+              </p>
             </div>
-            <div class="flex space-x-2">
-              <form action="/reservations/<%= reservation.id %>/confirm" method="post">
-                <button class="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-800">
-                  Confirm
-                </button>
-              </form>
-              <form action="/reservations/<%= reservation.id %>/cancel" method="post">
-                <button class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
-                  Cancel
-                </button>
-              </form>
-            </div>
+            <form class="cancel-form" data-reservation-id="<%= res.reservation_id %>">
+              <button type="button" class="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+                Cancel
+              </button>
+            </form>
           </li>
-        <% }) %>        
+        <% }) %>
       </ul>
     </section>
 
     <!-- Past Reservations -->
     <section>
       <h3 class="text-lg font-semibold mb-4">Past Reservations</h3>
-      <!--Template This-->
       <ul class="space-y-4">
-        <!-- <li class="bg-gray-200 shadow-md rounded-lg p-4">
-          <p class="font-semibold">Conference Hall | Seat 10</p>
-          <p class="text-gray-600 text-sm">Date: 2025-01-15 | Time: 1:00 PM - 3:00 PM</p>
-        </li> -->
-        <li class="bg-gray-200 shadow-md rounded-lg p-4">
-          <p class="font-semibold">Room 102 | Seat 7</p>
-          <p class="text-gray-600 text-sm">Date: 2025-01-12 | Time: 9:00 AM - 11:00 AM</p>
-        </li>
-        <% reservations.forEach(reservation => { %>
+        <% pastReservations.forEach(res => { %>
           <li class="bg-gray-200 shadow-md rounded-lg p-4">
-            <p class="font-semibold"><%= reservation.location %> | Seat <%= reservation.seat %></p>
-            <p class="text-gray-600 text-sm">Date: <%= reservation.date %> | Time: <%= reservation.start_time %> - <%= reservation.end_time %></p>
+            <p class="font-semibold"><%= res.institution_name %> | <%= res.space_name %> | Seat: <%= res.seat_name %></p>
+            <p class="text-gray-500 text-sm">Type: <%= res.type || 'N/A' %> | Facilities: <%= res.facilities || 'None' %></p>
+            <p class="text-gray-600 text-sm">
+              Date: <%= res.date %> | Time: <%= res.start_time %> - <%= res.end_time %>
+            </p>
           </li>
-        <% }) %>        
+        <% }) %>
       </ul>
     </section>
   </main>
+
+  <script>
+    // Handle cancel button clicks
+    document.querySelectorAll('.cancel-form').forEach(form => {
+      form.addEventListener('click', async () => {
+        const reservationId = form.getAttribute('data-reservation-id');
+        if (!confirm('Are you sure you want to cancel this reservation?')) return;
+
+        try {
+          const response = await fetch(`/reservations/${reservationId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
+          if (response.ok) location.reload();
+          else alert('Failed to cancel reservation.');
+        } catch (err) {
+          console.error('Error cancelling reservation:', err);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
