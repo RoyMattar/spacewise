@@ -38,6 +38,23 @@
           <label for="openingHours" class="block text-sm font-medium text-gray-700">Opening Hours</label>
           <input type="text" id="openingHours" value="<%= institution.opening_hours %>" placeholder="e.g., Mon-Fri: 9AM - 5PM" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
         </div>
+          <!--Implement here-->
+        <h3 class="text-xl font-semibold mb-4">Upload Institution Logo</h3>
+        <div class="p-4 bg-gray-50 border rounded-md mb-4">
+          <p class="text-gray-600 text-sm">Preview Logo</p>
+          <div id="layoutPreviewContainer" class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
+            <% if (institution.logo_image) { %>
+              <img id="logoUpload" src="<%= institution.logo_image %>" alt="Institution Image" class="w-full h-full object-contain">
+            <% } else { %>
+                <span id="previewPlaceholder" class="text-gray-500">No Logo Selected</span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Upload Layout -->
+        <h3 class="text-xl font-semibold mb-4">Upload Logo</h3>
+        <input type="file" id="logoUpload" name="logoImage" class="mt-2 block w-full p-2 border rounded-md mb-6">
+
         <button type="button" id="saveChangesBtn" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800 mb-4">
           Save Changes
         </button>
