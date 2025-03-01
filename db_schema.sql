@@ -34,6 +34,8 @@ CREATE TABLE institutions (
     FOREIGN KEY (admin_id) REFERENCES users(user_id) ON DELETE CASCADE -- Delete the institution if its admin user was deleted
 );
 
+ALTER TABLE institutions ADD COLUMN logo_image TEXT;
+
 -- Enforce: Institutions can refer only to admins
 CREATE TRIGGER enforce_admin_in_institution_insert
 BEFORE INSERT ON institutions

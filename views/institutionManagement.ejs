@@ -8,102 +8,156 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="/favicon.png">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Admin Navbar -->
   <%- include('partials/adminNavbar', { institutionId: institutionId }) %>
 
-  <!-- Main Content -->
   <main class="container mx-auto py-10 px-6">
     <h2 class="text-2xl font-semibold mb-6">Manage Your Institution</h2>
     <div class="bg-white p-6 shadow-md rounded-lg">
       <h3 class="text-xl font-semibold mb-4">Institution Details</h3>
-        <div class="mb-4">
-          <label for="institutionName" class="block text-sm font-medium text-gray-700">Institution Name</label>
-          <input type="text" id="institutionName" value="<%= institution.institution_name %>" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-        </div>
-        <div class="mb-4">
-          <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
-          <input type="text" id="address" value="<%= institution.address %>"class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-        </div>
-        <div class="mb-4">
-          <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
-          <textarea id="bio" rows="3" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600"><%= institution.bio || '' %></textarea>
-        </div>
-        <div class="mb-6">
-          <label for="openingHours" class="block text-sm font-medium text-gray-700">Opening Hours</label>
-          <input type="text" id="openingHours" value="<%= institution.opening_hours %>" placeholder="e.g., Mon-Fri: 9AM - 5PM" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
-        </div>
-          <!--Implement here-->
-        <h3 class="text-xl font-semibold mb-4">Upload Institution Logo</h3>
-        <div class="p-4 bg-gray-50 border rounded-md mb-4">
-          <p class="text-gray-600 text-sm">Preview Logo</p>
-          <div id="layoutPreviewContainer" class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
-            <% if (institution.logo_image) { %>
-              <img id="logoPreview" src="<%= institution.logo_image %>" alt="Institution Image" class="w-full h-full object-contain">
-            <% } else { %>
-                <span id="previewPlaceholder" class="text-gray-500">No Logo Selected</span>
-            <% } %>
-          </div>
-        </div>
+      <div class="mb-4">
+        <label for="institutionName" class="block text-sm font-medium text-gray-700">Institution Name</label>
+        <input type="text" id="institutionName" value="<%= institution.institution_name %>" 
+               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>
+      <div class="mb-4">
+        <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+        <input type="text" id="address" value="<%= institution.address %>"
+               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>
+      <div class="mb-4">
+        <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+        <textarea id="bio" rows="3" 
+                  class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600"><%= institution.bio || '' %></textarea>
+      </div>
+      <div class="mb-6">
+        <label for="openingHours" class="block text-sm font-medium text-gray-700">Opening Hours</label>
+        <input type="text" id="openingHours" value="<%= institution.opening_hours %>" placeholder="e.g., Mon-Fri: 9AM - 5PM"
+               class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-600 focus:border-purple-600">
+      </div>
 
-        <!-- Upload Layout -->
-        <h3 class="text-xl font-semibold mb-4">Upload Logo</h3>
-        <input type="file" id="logoUpload" name="logoImage" class="mt-2 block w-full p-2 border rounded-md mb-6">
+      <h3 class="text-xl font-semibold mb-4">Institution Logo</h3>
+      <div class="p-4 bg-gray-50 border rounded-md mb-4">
+        <div id="layoutPreviewContainer" class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
+          <% if (institution.logo_image) { %>
+            <img id="logoPreview" src="data:image/png;base64,<%= institution.logo_image %>" 
+                 alt="Institution Logo" class="w-full h-full object-contain">
+          <% } else { %>
+            <span id="previewPlaceholder" class="text-gray-500">No Logo Selected</span>
+          <% } %>
+        </div>
+      </div>
 
-        <button type="button" id="saveChangesBtn" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800 mb-4">
-          Save Changes
-        </button>
-        <hr class="my-6">
-        <button type="button" id="closeBtn" class="w-full px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
-          Close Institution
-        </button>
+      <input type="file" id="logoUpload" accept="image/*" class="mt-2 block w-full p-2 border rounded-md mb-6">
+
+      <button type="button" id="saveChangesBtn" class="w-full px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-800 mb-4">
+        Save Changes
+      </button>
+      <hr class="my-6">
+      <button type="button" id="closeBtn" class="w-full px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-800">
+        Close Institution
+      </button>
     </div>
   </main>
-  <script>
-    document.getElementById('saveChangesBtn').addEventListener('click', function () {
-      const institutionName = document.querySelector('#institutionName')?.value;
-      const address = document.querySelector('#address')?.value;
-      const openingHours = document.querySelector('#openingHours')?.value;
-      const bio = document.querySelector('#bio')?.value;
-      const logoFile = document.getElementById('logoUpload').files[0];
-      const institutionId = '<%= institutionId %>';
 
-      fetch(`/institutions/${institutionId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          institution_name: institutionName,
-          address: address,
-          opening_hours: openingHours,
-          bio: bio,
-          //logo: logoFile
-          if (logoFile) {
-             formData.append('logoImage', logoFile);
-          }
+  <script>
+    document.getElementById('saveChangesBtn').addEventListener('click', function() {
+      const fileInput = document.getElementById('logoUpload');
+      const logoFile = fileInput.files[0];
+      const saveButton = this;
+      
+      // Disable button during processing
+      saveButton.disabled = true;
+      saveButton.textContent = 'Saving...';
+
+      const processSave = (base64Image) => {
+        const institutionData = {
+          institution_name: document.getElementById('institutionName').value,
+          address: document.getElementById('address').value,
+          opening_hours: document.getElementById('openingHours').value,
+          bio: document.getElementById('bio').value,
+          logo_image: base64Image
+        };
+
+        fetch(`/institutions/${'<%= institutionId %>'}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(institutionData)
         })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to save changes.');
-        return response.json();
-      })
-      .then(data => {
-        alert('Changes saved successfully!');
-        if (logoFile) {
-          document.getElementById('logoImage').src = URL.createObjectURL(logoFile);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to save changes. Please try again.');
-      });
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to save changes');
+          return response.json();
+        })
+        .then(data => {
+          if (data.logo_image) {
+            const previewContainer = document.getElementById('layoutPreviewContainer');
+            previewContainer.innerHTML = `
+              <img id="logoPreview" src="data:image/png;base64,${data.logo_image}" 
+                   alt="Institution Logo" class="w-full h-full object-contain">
+            `;
+          }
+          alert('Changes saved successfully!');
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error saving changes: ' + error.message);
+        })
+        .finally(() => {
+          saveButton.disabled = false;
+          saveButton.textContent = 'Save Changes';
+        });
+      };
+
+      if (logoFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64String = e.target.result.split(',')[1]; // Remove data URL prefix
+          processSave(base64String);
+        };
+        reader.onerror = () => {
+          alert('Error reading image file');
+          saveButton.disabled = false;
+          saveButton.textContent = 'Save Changes';
+        };
+        reader.readAsDataURL(logoFile);
+      } else {
+        processSave(null);
+      }
     });
 
-    document.getElementById('closeBtn').addEventListener("click", function () {
+    // Handle logo preview
+    document.getElementById('logoUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const previewContainer = document.getElementById('layoutPreviewContainer');
+      
+      if (!file) {
+        previewContainer.innerHTML = '<span class="text-gray-500">No Logo Selected</span>';
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        this.value = ''; // Clear invalid file
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewContainer.innerHTML = `
+          <img src="${e.target.result}" 
+               class="w-full h-full object-contain" 
+               alt="Logo Preview">
+        `;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Keep your existing closeBtn logic
+    document.getElementById('closeBtn').addEventListener('click', function() {
+      // ... (existing close institution logic) ...
       const institutionId = '<%= institutionId %>';
 
       if (confirm("Are you sure you want to close this institution?\nThis action is permanent and will also close your account.")) {
@@ -121,34 +175,6 @@
         .catch(error => alert(error.message));
       }
     });
-    // Logo Upload Preview
-    document.getElementById('logoUpload').addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      if (!file) return; // No file selected (user canceled), do nothing
-
-      // Show "Loading..." immediately
-      const previewContainer = document.getElementById('layoutPreviewContainer');
-      previewContainer.innerHTML = '<span class="text-gray-500">Loading logo...</span>';
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const newImg = document.createElement("img");
-        newImg.id = "logoPreview";
-        newImg.src = reader.result;
-        newImg.classList.add("w-full", "h-full", "object-contain");
-
-        newImg.onload = function () {
-          previewContainer.innerHTML = ''; // Clear "Loading..."
-          previewContainer.appendChild(newImg); // Display new image
-        };
-      };
-      reader.readAsDataURL(file);
-    });
-
   </script>
-
-
 </body>
 </html>
-
-

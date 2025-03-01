@@ -66,9 +66,20 @@ function institutionsRouter(db) {
     });
 
     //Route to retrieve details of all institutions
+    // router.get('', requireAuth, function (req, res, next) {
+    //     db.all(
+    //         'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
+    //         [],
+    //         function (err, rows) {
+    //             if (err) return next(err);
+    //             res.render('institutionSelection', { institutions: rows });
+    //         }
+    //     );
+    // });
+    // In your GET /institutions route
     router.get('', requireAuth, function (req, res, next) {
         db.all(
-            'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
+            'SELECT institution_id, institution_name, bio, address, opening_hours, logo_image FROM institutions',
             [],
             function (err, rows) {
                 if (err) return next(err);
@@ -78,10 +89,18 @@ function institutionsRouter(db) {
     });
 
     //Route to retrieve details of a specific institution
+    //Route to retrieve details of a specific institution
     router.get('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.get(
-            `SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions
+            `SELECT 
+                institution_id, 
+                institution_name, 
+                bio, 
+                address, 
+                opening_hours,
+                logo_image  -- SQL comment style
+            FROM institutions
             WHERE institution_id = ?;`,
             [institutionId],
             function (err, row) {
@@ -93,27 +112,56 @@ function institutionsRouter(db) {
             }
         );
     });
-
-
     //Route to update an institution's details
-    router.patch('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
-        const { institution_name, bio, address, opening_hours } = req.body;
+    router.patch('/:id', requireAuth, ensureCorrectAdmin, function(req, res, next) {
         const institutionId = req.params.id;
+        const { institution_name, address, opening_hours, bio, logo_image } = req.body;
+    
+        // Basic validation
+        if (!institution_name || !address) {
+          return res.status(400).json({ error: 'Institution name and address are required' });
+        }
+    
+        // Validate base64 if provided
+        if (logo_image && !/^[A-Za-z0-9+/]+={0,2}$/.test(logo_image)) {
+          return res.status(400).json({ error: 'Invalid base64 image format' });
+        }
+    
         db.run(
-            `UPDATE institutions SET
-            institution_name = COALESCE(?, institution_name),
-            bio = COALESCE(?, bio),
-            address = COALESCE(?, address),
-            opening_hours = COALESCE(?, opening_hours)
-            WHERE institution_id = ?`,
-            [institution_name, bio, address, opening_hours, institutionId],
-            function (err) {
+          `UPDATE institutions SET
+          institution_name = ?,
+          address = ?,
+          opening_hours = ?,
+          bio = ?,
+          logo_image = ?
+          WHERE institution_id = ?`,
+          [
+            institution_name,
+            address,
+            opening_hours || null,
+            bio || null,
+            logo_image || null,
+            institutionId
+          ],
+          function(err) {
+            if (err) return next(err);
+            
+            // Return updated institution data
+            db.get(
+              'SELECT * FROM institutions WHERE institution_id = ?',
+              [institutionId],
+              (err, institution) => {
                 if (err) return next(err);
-                res.json({ message: 'Institution details updated successfully.' });
-            }
+                res.json({
+                  message: 'Institution updated successfully',
+                  logo_image: institution.logo_image
+                });
+              }
+            );
+          }
         );
-    });
-
+      });
+    
 
     //Route to delete an institution
     router.delete('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
