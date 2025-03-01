@@ -44,7 +44,7 @@
           <p class="text-gray-600 text-sm">Preview Logo</p>
           <div id="layoutPreviewContainer" class="mt-4 bg-gray-200 h-64 flex items-center justify-center">
             <% if (institution.logo_image) { %>
-              <img id="logoUpload" src="<%= institution.logo_image %>" alt="Institution Image" class="w-full h-full object-contain">
+              <img id="logoPreview" src="<%= institution.logo_image %>" alt="Institution Image" class="w-full h-full object-contain">
             <% } else { %>
                 <span id="previewPlaceholder" class="text-gray-500">No Logo Selected</span>
             <% } %>
@@ -70,6 +70,7 @@
       const address = document.querySelector('#address')?.value;
       const openingHours = document.querySelector('#openingHours')?.value;
       const bio = document.querySelector('#bio')?.value;
+      const logoFile = document.getElementById('logoUpload').files[0];
       const institutionId = '<%= institutionId %>';
 
       fetch(`/institutions/${institutionId}`, {
@@ -79,7 +80,11 @@
           institution_name: institutionName,
           address: address,
           opening_hours: openingHours,
-          bio: bio
+          bio: bio,
+          //logo: logoFile
+          if (logoFile) {
+             formData.append('logoImage', logoFile);
+          }
         })
       })
       .then(response => {
@@ -88,6 +93,9 @@
       })
       .then(data => {
         alert('Changes saved successfully!');
+        if (logoFile) {
+          document.getElementById('logoImage').src = URL.createObjectURL(logoFile);
+        }
       })
       .catch(error => {
         console.error('Error:', error);
@@ -113,7 +121,29 @@
         .catch(error => alert(error.message));
       }
     });
+    // Logo Upload Preview
+    document.getElementById('logoUpload').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (!file) return; // No file selected (user canceled), do nothing
 
+      // Show "Loading..." immediately
+      const previewContainer = document.getElementById('layoutPreviewContainer');
+      previewContainer.innerHTML = '<span class="text-gray-500">Loading logo...</span>';
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const newImg = document.createElement("img");
+        newImg.id = "logoPreview";
+        newImg.src = reader.result;
+        newImg.classList.add("w-full", "h-full", "object-contain");
+
+        newImg.onload = function () {
+          previewContainer.innerHTML = ''; // Clear "Loading..."
+          previewContainer.appendChild(newImg); // Display new image
+        };
+      };
+      reader.readAsDataURL(file);
+    });
 
   </script>
 
