@@ -14,6 +14,8 @@ SpaceWise is a web-based application aimed at simplifying shared space reservati
 - Notifications for reservations and reminders.
 - User authentication with role-based access for admins and students.
 
+SpaceWise is deployed to the World Wide Web and hosted on Render at: https://spacewise.onrender.com/.
+
 ---
 
 ## **Getting Started**
@@ -76,28 +78,35 @@ npm start
 
 The app will run at [http://localhost:3000](http://localhost:3000).
 
+Production Deployment: The app is hoted on Render at: https://spacewise.onrender.com/.
+
 ---
 
 ## **Project Structure**
 
 ```
 project-root/
-├── static/                # Static assets (CSS, JS, images)
-├── views/                 # EJS templates for rendering views
-├── routes/                # Route handlers for different modules
-│   ├── auth.js            # Routes for authentication (login/register)
-│   ├── admin.js           # Routes for admin functionality
-│   └── student.js         # Routes for student functionality
-├── middleware/            # Middleware for server
-│   ├── ensure_admin.js    # Middleware to protect admin routes by ensuring admin authentication
-├── database.db            # SQLite database file (generated after building the SQL file in step 4)
-├── db_schema.sql          # SQL file for database schema
-├── db_dummy_data.sql      # SQL file to insert dummy data into the database
-├── .env                   # Environment variables
-├── index.js               # Main entry point for the app
-├── package.json           # Dependencies and scripts
-├── package-lock.json      # Dependency lockfile (generated after running `npm install`)
-└── README.md              # Project documentation
+├── public/                      # Public resources
+│   ├── static/                  # Static assets (CSS, JS, images)
+│   ├── space_layouts/           # Space layout images stored on disk
+├── views/                       # EJS templates for rendering views
+│   ├── partials/                # Reusable EJS components
+├── routes/                      # Route handlers for different modules
+│   ├── auth.js                  # Routes for authentication (login/register)
+│   ├── admin.js                 # Routes for admin functionality
+│   └── student.js               # Routes for student functionality
+├── middleware/                  # Middleware for server
+│   ├── ensure_correct_admin.js  # Middleware to restrict access to correct admins only
+│   ├── require_auth.js          # Middleware to restrict access to authenticated users
+├── database.db                  # SQLite database file (generated after building the SQL file in step 4)
+├── db_schema.sql                # SQL file for database schema
+├── db_dummy_data.sql            # SQL file to insert dummy data into the database
+├── .env                         # Environment variables
+├── .github/workflows/ci.yml     # CI/CD automation using GitHub Actions
+├── index.js                     # Main entry point for the app
+├── package.json                 # Dependencies and scripts
+├── package-lock.json            # Dependency lockfile (generated after running `npm install`)
+└── README.md                    # Project documentation
 ```
 
 ---
@@ -156,6 +165,22 @@ The following npm scripts are available for database management and starting the
   ```bash
   npm run rebuild-db-dummy-win
   ```
+- **Run ESLint check:**
+  ```bash
+  npm run lint
+  ```
+- **Fix ESLint issues:**
+  ```bash
+  npm run lint:fix
+  ```
+- **Run API tests with Jest:**
+  ```bash
+  npm run test
+  ```
+- **Run CI validation locally (lint + test):**
+  ```bash
+  npm run ci
+  ```
 
 ---
 
@@ -169,6 +194,11 @@ The following npm scripts are available for database management and starting the
 - **express-session**: Session management.
 - **bcrypt**: Secure password hashing.
 - **TailwindCSS**: Styling framework for responsive and modern UI.
+- **GitHub Actions**: CI/CD automation for linting and testing.
+- **Jest**: API unit testing.
+- **Chrome DevTools' Network**: Test frontend API calls.
+- **ESLint**: Linting and code style enforcement.
+
 
 ---
 
@@ -184,10 +214,13 @@ The following npm scripts are available for database management and starting the
 - Follow **JavaScript Standard Style**.
 - Use comments to explain complex logic.
 - Update the README.md as necessary.
+- Ensure consistent code formatting using ESLint before submitting a PR.
 
 ### Testing
 - Unit tests are recommended for all new features.
-- Use a testing framework such as Mocha or Jest.
+- Use Jest to write tests for APIs.
+- Test API endpoints using Postman.
+- Test client API calls using Chrome DevTools' Network.
 
 ---
 
