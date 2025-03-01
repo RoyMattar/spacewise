@@ -29,11 +29,10 @@
             <% if (institution.logo_image) { %>
                 <img src="data:image/png;base64,<%= institution.logo_image %>" 
                 alt="<%= institution.institution_name %> Logo" 
-                class="w-full h-full object-contain">
+                class="w-24 h-24 object-contain">
                 <!-- <img src="<%= institution.logo_image %>" alt="Institution Image" class="w-full h-full object-contain"> -->
             <% } else { %>
-              <p class="text-gray-500">No logo available</p>
-              <img src="https://via.placeholder.com/100" id="logoUpload" alt="Institution Image" class="mb-3 w-24 h-24">
+              <img src="/emptyicon.png" id="logoUpload" alt="Institution Image" class="mb-3 w-24 h-24">
             <% } %>
             <h3 class="text-lg font-semibold mb-3"><%= institution.institution_name %></h3>
             <p class="text-gray-600 text-sm text-center mb-2"><%= institution.bio || 'No description available.' %></p>
