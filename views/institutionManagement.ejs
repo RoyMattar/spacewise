@@ -68,7 +68,7 @@
       const fileInput = document.getElementById('logoUpload');
       const logoFile = fileInput.files[0];
       const saveButton = this;
-      
+  
       // Disable button during processing
       saveButton.disabled = true;
       saveButton.textContent = 'Saving...';
@@ -154,9 +154,7 @@
       reader.readAsDataURL(file);
     });
 
-    // Keep your existing closeBtn logic
     document.getElementById('closeBtn').addEventListener('click', function() {
-      // ... (existing close institution logic) ...
       const institutionId = '<%= institutionId %>';
 
       if (confirm("Are you sure you want to close this institution?\nThis action is permanent and will also close your account.")) {

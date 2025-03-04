@@ -66,17 +66,6 @@ function institutionsRouter(db) {
     });
 
     //Route to retrieve details of all institutions
-    // router.get('', requireAuth, function (req, res, next) {
-    //     db.all(
-    //         'SELECT institution_id, institution_name, bio, address, opening_hours FROM institutions',
-    //         [],
-    //         function (err, rows) {
-    //             if (err) return next(err);
-    //             res.render('institutionSelection', { institutions: rows });
-    //         }
-    //     );
-    // });
-    // In your GET /institutions route
     router.get('', requireAuth, function (req, res, next) {
         db.all(
             'SELECT institution_id, institution_name, bio, address, opening_hours, logo_image FROM institutions',
@@ -89,17 +78,16 @@ function institutionsRouter(db) {
     });
 
     //Route to retrieve details of a specific institution
-    //Route to retrieve details of a specific institution
     router.get('/:id', requireAuth, ensureCorrectAdmin, function (req, res, next) {
         const institutionId = req.params.id;
         db.get(
             `SELECT 
-                institution_id, 
-                institution_name, 
-                bio, 
-                address, 
+                institution_id,
+                institution_name,
+                bio,
+                address,
                 opening_hours,
-                logo_image  -- SQL comment style
+                logo_image
             FROM institutions
             WHERE institution_id = ?;`,
             [institutionId],
