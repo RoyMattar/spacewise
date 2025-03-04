@@ -32,7 +32,7 @@ Ensure you have the following installed on your system:
 
 1. **Clone the Repository (optional if source code is not downloaded directly as a ZIP file):**
    ```bash
-   git clone https://github.com/your-repo/spacewise.git
+   git clone https://github.com/RoyMattar/spacewise.git
    cd spacewise
    ```
 
@@ -88,7 +88,7 @@ Production Deployment: The app is hoted on Render at: https://spacewise.onrender
 project-root/
 ├── public/                      # Public resources
 │   ├── static/                  # Static assets (CSS, JS, images)
-│   ├── space_layouts/           # Space layout images stored on disk
+│   └── space_layouts/           # Space layout images stored on disk
 ├── views/                       # EJS templates for rendering views
 │   ├── partials/                # Reusable EJS components
 ├── routes/                      # Route handlers for different modules
@@ -97,7 +97,13 @@ project-root/
 │   └── student.js               # Routes for student functionality
 ├── middleware/                  # Middleware for server
 │   ├── ensure_correct_admin.js  # Middleware to restrict access to correct admins only
-│   ├── require_auth.js          # Middleware to restrict access to authenticated users
+│   └── require_auth.js          # Middleware to restrict access to authenticated users
+├── tests/                       # Automated JEST tests
+│   ├── auth.test.js             # Tests for authentication routes
+│   ├── institutions.test.js     # Tests for institution routes
+│   ├── reservations.test.js     # Tests for reservation routes
+│   ├── test_db.js               # In-memory DB setup for tests
+│   └── test_setup.js            # Common test setup (Express app, sessions, etc.)
 ├── database.db                  # SQLite database file (generated after building the SQL file in step 4)
 ├── db_schema.sql                # SQL file for database schema
 ├── db_dummy_data.sql            # SQL file to insert dummy data into the database
@@ -208,7 +214,7 @@ The following npm scripts are available for database management and starting the
 - Create feature-specific branches for development.
 - Submit pull requests for review before merging.
 - Include clear commit messages for traceability (titles and descriptions).
-- Include tags in the commit titles for clarity - [INFRA], [SERVER] or [CLIENT].
+- Include tags in the commit titles for clarity - [INFRA], [SERVER], [CLIENT], [TEST] or [DOC].
 
 ### Code Style
 - Follow **JavaScript Standard Style**.
