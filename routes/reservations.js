@@ -10,11 +10,20 @@ function reservationsRouter(db) {
             const institutionId = req.session.user.institutionId;
             db.all(
                 `
-                SELECT r.reservation_id, r.user_id, r.seat_id, r.start_time, r.end_time, r.status
+                SELECT
+                    r.reservation_id,
+                    r.user_id,
+                    u.username,
+                    r.seat_id,
+                    s.seat_name,
+                    r.start_time,
+                    r.end_time,
+                    r.status
                 FROM reservations r
                 JOIN seats s ON r.seat_id = s.seat_id
                 JOIN spaces sp ON s.space_id = sp.space_id
                 JOIN institutions i ON sp.institution_id = i.institution_id
+                JOIN users u ON r.user_id = u.user_id
                 WHERE i.institution_id = ?
                 `,
                 [institutionId],
