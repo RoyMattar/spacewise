@@ -126,7 +126,7 @@ function reservationsRouter(db) {
             [id],
             function (err) {
                 if (err) return next(err);
-                res.json({ message: 'Reservation canceled successfully.' });
+                res.json({ message: 'Reservation cancelled successfully.' });
             }
         );
     });

@@ -1,8 +1,6 @@
 const request = require('supertest');
-const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
 const { setupTestDB, closeTestDB } = require('./test_db');
+const createTestApp = require('./test_setup');
 const authRouter = require('../routes/auth');
 
 let agent; // Persistent session for auth tests
@@ -13,18 +11,7 @@ beforeAll(async () => {
         throw new Error("Test database (db) is not initialized.");
     }
 
-    const app = express();
-    app.use(bodyParser.json()); // Parse JSON request bodies
-    app.use(bodyParser.urlencoded({ extended: true })); // Parse form submissions
-    app.use(session({
-        secret: 'test-secret', // Use a hard-coded secret to simplify test setup
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false } // Ensure cookies work over HTTP and not HTTPS
-    }));
-    app.set('view engine', 'ejs'); // set the app to use ejs for rendering
-    app.use(express.static(__dirname + '/static')); // set location of static files
-
+    const app = createTestApp();
     app.use('/', authRouter(db)); // Inject test database into auth router
 
     agent = request.agent(app); // Keep session across requests
